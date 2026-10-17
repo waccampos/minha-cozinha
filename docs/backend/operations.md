@@ -2,6 +2,12 @@
 
 # Operação do PostgreSQL existente
 
+## Ferramentas Docker e engines do Prisma
+
+O estágio base inclui OpenSSL antes da instalação de dependências para manter a detecção de plataforma consistente. O estágio tools prepara o engine do Prisma durante o build e valida o schema como UID 1001, o mesmo usuário definido no Compose. O diretório de engines e o HOME desse usuário permitem as gravações de cache necessárias. A validação do schema não aplica migrations nem conecta ao banco.
+
+Após atualizar o Dockerfile, reconstrua `docker compose build tools` e execute `docker compose --profile tools run --rm tools npm run db:validate` antes de tentar migrations. Um erro de permissão em `/app/node_modules/@prisma/engines` deve ser corrigido na imagem; não altere as permissões do PostgreSQL, do diretório de dados do banco nem dos volumes de outras aplicações.
+
 Não há serviço PostgreSQL no Compose. O código força o schema `minha_cozinha` tanto no client quanto nas migrations. Nunca use `prisma migrate reset`, `db push --accept-data-loss` ou `DROP SCHEMA ... CASCADE` no banco compartilhado.
 
 ## Preparação pelo administrador
