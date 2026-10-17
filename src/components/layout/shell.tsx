@@ -33,7 +33,7 @@ export default function Shell({
   const cooking = path.endsWith("/cozinhar");
 
   return (
-    <div className="app">
+    <div className={cooking ? "app" : "app app-with-navigation"}>
       <a className="skip-link" href="#main-content">
         Pular para o conteúdo
       </a>

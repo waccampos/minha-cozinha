@@ -1,6 +1,8 @@
 import "@/styles/globals.css";
+import "@/styles/mobile.css";
+import "@/styles/recipe-prompt.css";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import Footer from "@/components/layout/footer";
@@ -14,6 +16,13 @@ export const metadata: Metadata = {
   title: { default: "Minha Cozinha", template: "%s | Minha Cozinha" },
   description: "Sua coleção de receitas, memórias e descobertas.",
   icons: { icon: "/favicon.svg" },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fffdf9",
 };
 
 export const dynamic = "force-dynamic";

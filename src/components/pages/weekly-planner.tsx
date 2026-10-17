@@ -18,6 +18,11 @@ export default function Planner() {
   const { openRecipe, navigate } = useKitchenNavigation();
   const [week, setWeek] = useState(0);
   const [slot, setSlot] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState(
+    () => (new Date().getUTCDay() + 6) % 7,
+  );
+
+  const [today] = useState(() => isoDate(new Date()));
   const [start] = useState(() => isoDate(monday()));
   const days = weekDays(start, week);
   const date = (value: Date, options: Intl.DateTimeFormatOptions) =>
@@ -61,7 +66,38 @@ export default function Planner() {
           ›
         </button>
       </div>
-      <div className="planner">
+      <nav className="planner-days" aria-label="Escolher dia da semana">
+        {days.map((day, index) => (
+          <button
+            key={isoDate(day)}
+            type="button"
+            aria-label={date(day, {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+            })}
+            aria-pressed={selectedDay === index}
+            aria-controls="weekly-meals"
+            onClick={() => setSelectedDay(index)}
+          >
+            <span>{date(day, { weekday: "short" }).replace(".", "")}</span>
+            <strong>{date(day, { day: "numeric" })}</strong>
+            {isoDate(day) === today && <span className="sr-only">Hoje</span>}
+          </button>
+        ))}
+      </nav>
+      <p
+        className="planner-selected-date"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {date(days[selectedDay], {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        })}
+      </p>
+      <div className="planner" id="weekly-meals">
         <div className="meal-labels">
           <span></span>
           {meals.map((m) => (
@@ -69,8 +105,11 @@ export default function Planner() {
           ))}
         </div>
         {days.map((day, i) => (
-          <div className="day-column" key={day.toISOString()}>
-            <div className={i === 0 ? "today" : ""}>
+          <div
+            className={`day-column${i === selectedDay ? " selected-day" : ""}`}
+            key={day.toISOString()}
+          >
+            <div className={isoDate(day) === today ? "today" : ""}>
               <strong>
                 {date(day, { weekday: "short" }).replace(".", "")}
               </strong>
@@ -88,7 +127,8 @@ export default function Planner() {
                   aria-label={`${meal}: ${recipe.title}`}
                 >
                   <RecipeImage src={recipe.image} alt="" />
-                  <span>{recipe.title}</span>
+                  <span className="meal-name">{meal}</span>
+                  <span className="meal-title">{recipe.title}</span>
                 </button>
               ) : (
                 <button
@@ -97,7 +137,10 @@ export default function Planner() {
                   onClick={() => setSlot(key)}
                   aria-label={`Adicionar ${meal}, ${date(day, { weekday: "long" })}`}
                 >
-                  <Icon name="plus" size={16} /> Adicionar
+                  <span className="meal-name">{meal}</span>
+                  <span className="meal-placeholder">
+                    <Icon name="plus" size={16} /> Adicionar
+                  </span>
                 </button>
               );
             })}

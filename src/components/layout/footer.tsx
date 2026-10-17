@@ -1,3 +1,5 @@
+import RecipePromptDialog from "@/components/common/recipe-prompt-dialog";
+
 export default function Footer() {
   return (
     <footer>
@@ -10,6 +12,7 @@ export default function Footer() {
         </div>
         <p>Receitas, memórias e afeto à mesa.</p>
         <span>Feito para cozinhar com calma.</span>
+        <RecipePromptDialog />
       </div>
     </footer>
   );

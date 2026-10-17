@@ -16,6 +16,8 @@ import {
   Pencil,
   Play,
   Check,
+  House,
+  Copy,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +39,8 @@ const icons: Record<string, LucideIcon> = {
   edit: Pencil,
   play: Play,
   check: Check,
+  home: House,
+  copy: Copy,
 };
 
 export default function Icon({

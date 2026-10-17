@@ -1,18 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 import Button from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import type { Page } from "@/lib/navigation";
 
-const links: { label: string; page: Page; href: string }[] = [
-  { label: "Início", page: "home", href: "/" },
-  { label: "Receitas", page: "library", href: "/receitas" },
-  { label: "Favoritos", page: "favorites", href: "/favoritos" },
-  { label: "Planejamento", page: "planner", href: "/planejamento" },
-  { label: "Compras", page: "shopping", href: "/compras" },
+const links: {
+  label: string;
+  mobileLabel?: string;
+  icon: string;
+  page: Page;
+  href: string;
+}[] = [
+  { label: "Início", icon: "home", page: "home", href: "/" },
+  { label: "Receitas", icon: "grid", page: "library", href: "/receitas" },
+  { label: "Favoritos", icon: "heart", page: "favorites", href: "/favoritos" },
+  {
+    label: "Planejamento",
+    mobileLabel: "Semana",
+    icon: "calendar",
+    page: "planner",
+    href: "/planejamento",
+  },
+  { label: "Compras", icon: "bag", page: "shopping", href: "/compras" },
 ];
 
 export default function Navigation({
@@ -22,60 +33,60 @@ export default function Navigation({
   page: Page;
   navigate: (page: Page) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const isActive = (target: Page) =>
+    page === target || (target === "library" && page === "search");
 
   return (
-    <header className="navigation">
-      <Link className="brand" href="/" onClick={() => setOpen(false)}>
-        <span className="brand-mark">M</span>
-        <span>
-          Minha <i>Cozinha</i>
-        </span>
-      </Link>
-      <nav
-        id="main-navigation"
-        aria-label="Navegação principal"
-        className={open ? "open" : ""}
-      >
-        {links.map((link) => {
-          const active =
-            page === link.page ||
-            (link.page === "library" && page === "search");
-
-          return (
+    <>
+      <header className="navigation">
+        <Link className="brand" href="/">
+          <span className="brand-mark">M</span>
+          <span>
+            Minha <i>Cozinha</i>
+          </span>
+        </Link>
+        <nav aria-label="Navegação principal">
+          {links.map((link) => (
             <Link
               key={link.page}
               href={link.href}
-              className={active ? "active" : ""}
-              aria-current={active ? "page" : undefined}
-              onClick={() => setOpen(false)}
+              className={isActive(link.page) ? "active" : ""}
+              aria-current={isActive(link.page) ? "page" : undefined}
             >
               {link.label}
             </Link>
-          );
-        })}
-        <Link
-          className="new-recipe-mobile"
-          href="/receitas/nova"
-          onClick={() => setOpen(false)}
-        >
-          Nova receita
-        </Link>
+          ))}
+        </nav>
+        <div className="nav-actions">
+          <Button onClick={() => navigate("form")} icon="plus">
+            Nova receita
+          </Button>
+          <Link
+            className="mobile-add-recipe"
+            href="/receitas/nova"
+            aria-label="Adicionar nova receita"
+          >
+            <Icon name="plus" size={19} />
+            <span>Receita</span>
+          </Link>
+        </div>
+      </header>
+      <nav className="mobile-navigation" aria-label="Navegação principal móvel">
+        {links.map((link) => (
+          <Link
+            key={link.page}
+            href={link.href}
+            className={isActive(link.page) ? "active" : ""}
+            aria-label={link.label}
+            aria-current={isActive(link.page) ? "page" : undefined}
+          >
+            <span className="mobile-navigation-icon">
+              <Icon name={link.icon} size={21} />
+            </span>
+            <span>{link.mobileLabel ?? link.label}</span>
+          </Link>
+        ))}
       </nav>
-      <div className="nav-actions">
-        <Button onClick={() => navigate("form")} icon="plus">
-          Nova receita
-        </Button>
-        <button
-          className="menu-btn"
-          aria-label={open ? "Fechar menu" : "Abrir menu"}
-          aria-expanded={open}
-          aria-controls="main-navigation"
-          onClick={() => setOpen(!open)}
-        >
-          <Icon name={open ? "x" : "menu"} />
-        </button>
-      </div>
-    </header>
+    </>
   );
 }

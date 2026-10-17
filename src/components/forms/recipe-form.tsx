@@ -395,6 +395,12 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe }) {
             </div>
           </aside>
         </div>
+        <div className="mobile-form-actions">
+          <button className="btn btn-primary" type="submit" disabled={pending}>
+            <Icon name="check" size={18} />
+            {pending ? "Salvando receita…" : "Salvar receita"}
+          </button>
+        </div>
       </form>
       {saved !== null && (
         <div className="toast" role="status">
