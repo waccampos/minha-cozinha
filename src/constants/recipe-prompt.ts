@@ -9,8 +9,8 @@ Um nome claro, com até 120 caracteres.
 DESCRIÇÃO
 Um resumo do prato em uma ou duas frases.
 
-CATEGORIA
-Sugira uma única categoria curta, como Massas, Sobremesas, Bebidas ou Saudáveis. Se eu informar minhas categorias cadastradas, prefira uma delas.
+CATEGORIAS
+Informe uma ou mais categorias adequadas, separadas por vírgulas, como Massas, Sobremesas, Bebidas ou Saudáveis. Uma receita pode ser Sobremesas e Saudáveis ao mesmo tempo. Se eu informar minhas categorias cadastradas, prefira essas opções. Não repita categorias e use no máximo 30.
 
 TEMPO TOTAL EM MINUTOS
 Informe um número inteiro, incluindo preparo, cozimento e descanso ou refrigeração. O formulário aceita de 1 a 1440 minutos. Se a receita precisar de mais de 24 horas, avise antes de apresentar uma adaptação viável; não reduza o tempo artificialmente.

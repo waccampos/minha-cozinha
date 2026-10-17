@@ -4,7 +4,10 @@ import type { Prisma } from "@/generated/prisma/client";
 import type { Recipe } from "@/types/recipe";
 
 export const recipeInclude = {
-  category: true,
+  categories: {
+    include: { category: true },
+    orderBy: { category: { name: "asc" } },
+  },
   image: true,
   ingredients: { orderBy: { position: "asc" } },
   steps: { orderBy: { position: "asc" } },
@@ -22,7 +25,7 @@ export function recipeDto(row: RecipeRow): Recipe {
     image: row.imageId
       ? `/api/images/${row.imageId}`
       : "/images/recipe-placeholder.svg",
-    category: row.category.name,
+    categories: row.categories.map((link) => link.category.name),
     time: row.time,
     servings: row.servings,
     difficulty: row.difficulty as Recipe["difficulty"],

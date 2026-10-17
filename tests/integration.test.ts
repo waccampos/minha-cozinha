@@ -24,6 +24,7 @@ test(
     const marker = "Integração " + randomUUID();
     const initial = await readKitchen();
     let categoryId: number | undefined;
+    let secondCategoryId: number | undefined;
     let recipeId: number | undefined;
     let listId: string | undefined;
 
@@ -32,10 +33,16 @@ test(
         (await executeCommand({ type: "category.save", name: marker })).id,
       );
 
+      const secondCategory = marker + " segunda";
+      secondCategoryId = Number(
+        (await executeCommand({ type: "category.save", name: secondCategory }))
+          .id,
+      );
+
       const values = {
         title: marker,
         description: "Tomate com mandioca",
-        category: marker,
+        categories: [marker, secondCategory],
         time: 15,
         servings: "2 porções",
         difficulty: "Fácil",
@@ -55,6 +62,44 @@ test(
         (await executeCommand({ type: "recipe.save", values })).id,
       );
       assert.ok(recipeId > 0);
+      assert.equal(
+        await getDb().recipeCategory.count({ where: { recipeId } }),
+        2,
+      );
+
+      const { listRecipes, recipeDetail } = await import(
+        "../src/server/services/recipe.service"
+      );
+
+      for (const category of values.categories) {
+        const page = await listRecipes({ category });
+        assert.equal(page.items.filter((r) => r.id === recipeId).length, 1);
+      }
+
+      const combined = await searchRecipes({
+        q: "",
+        categories: values.categories,
+      });
+
+      assert.equal(combined.recipes.filter((r) => r.id === recipeId).length, 1);
+
+      const multipleState = await readKitchen();
+      assert.equal(multipleState.categoryCounts[marker], 1);
+      assert.equal(multipleState.categoryCounts[secondCategory], 1);
+      await assert.rejects(
+        executeCommand({ type: "category.delete", id: categoryId }),
+      );
+      await assert.rejects(
+        executeCommand({
+          type: "recipe.save",
+          id: recipeId,
+          values: { ...values, categories: [marker + " inexistente"] },
+        }),
+      );
+      assert.equal(
+        await getDb().recipeCategory.count({ where: { recipeId } }),
+        2,
+      );
       await executeCommand({ type: "favorite.set", recipeId, value: true });
       await executeCommand({ type: "favorite.set", recipeId, value: true });
       assert.equal(await getDb().favorite.count({ where: { recipeId } }), 1);
@@ -158,8 +203,16 @@ test(
       await executeCommand({
         type: "recipe.save",
         id: recipeId,
-        values: { ...values, title: marker + " editada" },
+        values: {
+          ...values,
+          title: marker + " editada",
+          categories: [secondCategory],
+        },
       });
+      assert.deepEqual((await recipeDetail(recipeId))?.recipe.categories, [
+        secondCategory,
+      ]);
+      assert.equal((await listRecipes({ category: marker })).total, 0);
       assert.equal(
         (await getDb().recipe.findUniqueOrThrow({ where: { id: recipeId } }))
           .title,
@@ -183,6 +236,11 @@ test(
       if (categoryId)
         await getDb().category.deleteMany({
           where: { id: categoryId, name: marker },
+        });
+
+      if (secondCategoryId)
+        await getDb().category.deleteMany({
+          where: { id: secondCategoryId, name: marker + " segunda" },
         });
 
       await getDb().$disconnect();

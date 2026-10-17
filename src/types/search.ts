@@ -4,7 +4,7 @@ export type ParsedSearch = {
   maxTime?: number;
   temperature?: string;
   flavor?: string;
-  category?: string;
+  categories: string[];
   terms: string;
 };
 

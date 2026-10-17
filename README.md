@@ -55,6 +55,8 @@ A aplicação abre diretamente, sem login, senha ou sessão. Todos os dispositiv
 
 ## 4. PostgreSQL e migrations
 
+Receitas aceitam múltiplas categorias. A atualização substitui a coluna única por uma tabela de associação, preservando os vínculos antigos. Antes de atualizar uma instalação existente, siga o [procedimento de migration em manutenção](docs/backend/multiple-categories.md); não execute a versão antiga da aplicação sobre o schema novo.
+
 O pedido mais recente autoriza criar o banco `minha_cozinha` na instância existente em `10.0.0.117`. O [procedimento de provisionamento](docs/backend/provisioning.md) gera usuários próprios e documenta as permissões por schema, sem exigir alteração no pg_hba.conf. Nenhuma credencial administrativa deve permanecer na aplicação.
 
 Prepare as roles e o schema conforme [docs/backend/operations.md](docs/backend/operations.md). O runtime não deve ser superusuário nem proprietário do banco. A role de migração precisa de DDL somente no schema da aplicação.

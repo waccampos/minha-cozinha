@@ -15,8 +15,10 @@ import type { Recipe } from "@/types/recipe";
 
 export default function Library({
   favoritesOnly = false,
+  initialCategory,
 }: {
   favoritesOnly?: boolean;
+  initialCategory?: string;
 }) {
   const { favorites: favoriteIds, toggleFavorite: onFavorite } = useKitchen();
 
@@ -24,7 +26,11 @@ export default function Library({
 
   const { openRecipe } = useKitchenNavigation();
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState(defaultLibraryFilters);
+  const [filters, setFilters] = useState({
+    ...defaultLibraryFilters,
+    category: initialCategory ?? "Todas",
+  });
+
   const [sort, setSort] = useState("recent");
   const [list, setList] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);

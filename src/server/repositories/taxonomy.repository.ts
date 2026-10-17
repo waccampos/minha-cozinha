@@ -2,8 +2,8 @@ import "server-only";
 
 import type { Transaction } from "@/server/database/prisma";
 
-export function findCategoryByName(tx: Transaction, name: string) {
-  return tx.category.findUnique({ where: { name } });
+export function findCategoriesByNames(tx: Transaction, names: string[]) {
+  return tx.category.findMany({ where: { name: { in: names } } });
 }
 
 export function saveCategory(tx: Transaction, name: string, id?: number) {
@@ -31,7 +31,7 @@ export async function recipeIdsForCategory(
   categoryId: number,
 ) {
   const rows = await tx.recipe.findMany({
-    where: { categoryId },
+    where: { categories: { some: { categoryId } } },
     select: { id: true },
   });
 

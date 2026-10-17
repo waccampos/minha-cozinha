@@ -57,8 +57,8 @@ export default function RecipePromptDialog() {
               resposta para o formulário de nova receita.
             </p>
             <p>
-              Escolha uma categoria cadastrada no site ou cadastre a sugerida
-              antes de salvar. A foto é adicionada separadamente.
+              Selecione as categorias cadastradas no site ou cadastre as
+              sugeridas antes de salvar. A foto é adicionada separadamente.
             </p>
             <label htmlFor={id}>Prompt completo</label>
             <textarea

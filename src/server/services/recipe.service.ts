@@ -7,6 +7,7 @@ import { recipeListInput } from "@/schemas/recipe-list.schema";
 import type { Transaction } from "@/server/database/prisma";
 import {
   persistRecipe,
+  replaceRecipeCategories,
   replaceRecipeContents,
   findRecipeSearchSource,
   updateRecipeSearch,
@@ -15,7 +16,7 @@ import {
   findRecipePage,
   findRecipeDetail,
 } from "@/server/repositories/recipe.repository";
-import { findCategoryByName } from "@/server/repositories/taxonomy.repository";
+import { findCategoriesByNames } from "@/server/repositories/taxonomy.repository";
 
 import { resolveImageId } from "./image.service";
 
@@ -33,7 +34,7 @@ export async function rebuildRecipeSearch(tx: Transaction, id: number) {
     [
       recipe.title,
       recipe.description,
-      recipe.category.name,
+      ...recipe.categories.map((link) => link.category.name),
       recipe.notes,
       ...recipe.ingredients.map((ingredient) => ingredient.name),
       ...recipe.tags.map((link) => link.tag.name),
@@ -47,25 +48,29 @@ export async function saveRecipe(
   tx: Transaction,
   command: CommandOf<"recipe.save">,
 ) {
-  const { ingredients, steps, tags, image, category, ...values } =
+  const { ingredients, steps, tags, image, categories, ...values } =
     command.values;
 
-  const categoryRow = await findCategoryByName(tx, category);
+  const categoryRows = await findCategoriesByNames(tx, categories);
 
-  if (!categoryRow) {
-    throw new DomainError("Selecione uma categoria existente.");
+  if (categoryRows.length !== categories.length) {
+    throw new DomainError("Selecione apenas categorias existentes.");
   }
 
   const recipe = await persistRecipe(
     tx,
     {
       ...values,
-      categoryId: categoryRow.id,
       imageId: await resolveImageId(tx, image),
     },
     command.id,
   );
 
+  await replaceRecipeCategories(
+    tx,
+    recipe.id,
+    categoryRows.map((category) => category.id),
+  );
   await replaceRecipeContents(tx, recipe.id, { ingredients, steps, tags });
   await rebuildRecipeSearch(tx, recipe.id);
 

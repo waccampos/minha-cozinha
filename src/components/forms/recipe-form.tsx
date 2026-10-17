@@ -34,7 +34,7 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe }) {
       title: recipe?.title ?? "",
       description: recipe?.description ?? "",
       image: recipe?.image.startsWith("/api/images/") ? recipe.image : "",
-      category: recipe?.category as RecipeFormValues["category"] | undefined,
+      categories: recipe?.categories ?? [],
       time: recipe?.time,
       servings: recipe?.servings ?? "",
       difficulty: recipe?.difficulty ?? "Fácil",
@@ -150,19 +150,60 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe }) {
                 <p>Ajude a organizar sua coleção.</p>
               </div>
               <div className="fields-grid">
-                <div className="field">
-                  <label htmlFor="recipe-category">Categoria</label>
-                  <select
-                    id="recipe-category"
-                    {...register("category")}
-                    aria-invalid={!!errors.category}
-                  >
-                    <option value="">Escolha uma categoria</option>
-                    {categories.map((c) => (
-                      <option key={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                  {fieldError(errors.category?.message)}
+                <fieldset className="field recipe-category-field">
+                  <legend>Categorias</legend>
+                  <p id="recipe-categories-help">
+                    Selecione uma ou mais categorias.
+                  </p>
+                  <Controller
+                    name="categories"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="recipe-category-options">
+                        {categories.map((category, index) => (
+                          <label key={category.id}>
+                            <input
+                              type="checkbox"
+                              name={field.name}
+                              value={category.name}
+                              ref={index === 0 ? field.ref : undefined}
+                              checked={field.value.includes(category.name)}
+                              onBlur={field.onBlur}
+                              aria-invalid={!!errors.categories}
+                              aria-describedby={
+                                errors.categories
+                                  ? "recipe-categories-help recipe-categories-error"
+                                  : "recipe-categories-help"
+                              }
+                              onChange={(event) =>
+                                field.onChange(
+                                  event.target.checked
+                                    ? [...field.value, category.name]
+                                    : field.value.filter(
+                                        (name) => name !== category.name,
+                                      ),
+                                )
+                              }
+                            />
+                            <span>{category.name}</span>
+                          </label>
+                        ))}
+                        {!categories.length && (
+                          <p>Cadastre uma categoria para começar.</p>
+                        )}
+                      </div>
+                    )}
+                  />
+                  {errors.categories && (
+                    <small
+                      id="recipe-categories-error"
+                      className="field-error"
+                      role="alert"
+                    >
+                      {errors.categories.message ??
+                        "Confira as categorias selecionadas."}
+                    </small>
+                  )}
                   <button
                     type="button"
                     className="text-action"
@@ -170,7 +211,7 @@ export default function RecipeForm({ recipe }: { recipe?: Recipe }) {
                   >
                     Gerenciar categorias
                   </button>
-                </div>
+                </fieldset>
                 <div className="field">
                   <label htmlFor="recipe-time">Tempo de preparo</label>
                   <input

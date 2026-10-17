@@ -14,6 +14,8 @@ export default function useKitchenNavigation(id?: number) {
       router.push(pageHref("detail", recipe.id)),
     runSearch: (query: string) =>
       router.push(`/busca?q=${encodeURIComponent(query)}`),
+    openCategory: (category: string) =>
+      router.push(`/receitas?category=${encodeURIComponent(category)}`),
     openPantry: () => router.push("/busca?modo=despensa"),
   };
 }

@@ -11,10 +11,15 @@ export async function searchRecipes(input: unknown) {
     ...parseSearch(values.q),
     ...Object.fromEntries(
       Object.entries(values).filter(
-        ([key, value]) => key !== "q" && value !== undefined,
+        ([key, value]) =>
+          key !== "q" && key !== "category" && value !== undefined,
       ),
     ),
-  } as ReturnType<typeof parseSearch>;
+  };
+
+  if (values.category) {
+    parsed.categories = [...new Set([...parsed.categories, values.category])];
+  }
 
   return findMatchingRecipes(parsed);
 }

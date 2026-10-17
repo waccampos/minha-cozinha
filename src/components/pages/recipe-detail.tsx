@@ -43,7 +43,14 @@ export default function Detail({
       <section className="detail-hero shell">
         <div className="detail-image">
           <RecipeImage src={recipe.image} alt={recipe.title} />
-          <span>{recipe.category}</span>
+          <ul
+            className="recipe-detail-categories"
+            aria-label="Categorias da receita"
+          >
+            {recipe.categories.map((category) => (
+              <li key={category}>{category}</li>
+            ))}
+          </ul>
         </div>
         <div className="detail-copy">
           <p className="eyebrow">{recipe.tags.join(" · ")}</p>

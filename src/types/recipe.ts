@@ -3,7 +3,7 @@ export type Recipe = {
   title: string;
   description: string;
   image: string;
-  category: string;
+  categories: string[];
   time: number;
   difficulty: "Fácil" | "Médio" | "Avançado";
   rating: number;

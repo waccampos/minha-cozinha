@@ -19,7 +19,6 @@ export const dateSchema = z.iso
   );
 
 const recipeValues = recipeFormSchema.extend({
-  category: name,
   image: z.string().regex(/^(?:|\/api\/images\/[a-f0-9-]{36})$/),
   tags: z.array(name).max(30).default([]),
 });

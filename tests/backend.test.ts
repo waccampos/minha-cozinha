@@ -28,7 +28,7 @@ test("interpreta ingredientes, sinônimos, exclusões, tempo e temperatura", () 
     "Quero macarrão quente com tomate sem leite em até 30 minutos",
   );
 
-  assert.equal(parsed.category, "Massas");
+  assert.deepEqual(parsed.categories, ["Massas"]);
   assert.equal(parsed.temperature, "Quente");
   assert.equal(parsed.maxTime, 30);
   assert.ok(parsed.include.includes("tomate"));

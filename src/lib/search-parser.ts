@@ -123,19 +123,23 @@ export function parseSearch(query: string): ParsedSearch {
       ? "Salgado"
       : undefined;
 
-  const category = /massa|macarrao|espaguete|lasanha/.test(text)
-    ? "Massas"
-    : /sobremesa/.test(text)
-      ? "Sobremesas"
-      : /bebida|suco|vitamina/.test(text)
-        ? "Bebidas"
-        : /sopa|caldo/.test(text)
-          ? "Sopas"
-          : /cafe da manha/.test(text)
-            ? "Café da manhã"
-            : /saudavel|leve/.test(text)
-              ? "Saudáveis"
-              : undefined;
+  const categoryPatterns: [string, RegExp][] = [
+    ["Massas", /\b(?:massas?|macarrao|espaguete|lasanha)\b/],
+    ["Sobremesas", /\bsobremesas?\b/],
+    ["Bebidas", /\b(?:bebidas?|sucos?|vitaminas?)\b/],
+    ["Sopas", /\b(?:sopas?|caldos?)\b/],
+    ["Café da manhã", /\bcafe da manha\b/],
+    ["Saudáveis", /\b(?:saudavel|saudaveis|leves?)\b/],
+  ];
+
+  const categories = categoryPatterns
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([name]) => name);
+
+  // As categorias já viram filtros; não devem limitar novamente o texto livre.
+  for (const [, pattern] of categoryPatterns) {
+    text = text.replace(new RegExp(pattern.source, "g"), " ");
+  }
 
   const stop = new Set(
     "quero algo uma um com de do da para preparar fazer receita receitas que tenha e ou em ate minutos minuto hora horas no maximo rapido rapida quente fria frio gelado gelada doce salgado salgada massa massas macarrao sobremesa sobremesas bebida bebidas saudavel leve sopa sopas cafe manha".split(
@@ -160,7 +164,7 @@ export function parseSearch(query: string): ParsedSearch {
     maxTime,
     temperature,
     flavor,
-    category,
+    categories,
     terms,
   };
 }

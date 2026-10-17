@@ -5,10 +5,19 @@ import { imageSchema } from "./image.schema";
 const text = (label: string) =>
   z.string().trim().min(1, `${label} é obrigatório.`);
 
+export const recipeCategoriesSchema = z
+  .array(text("Categoria").max(80))
+  .min(1, "Selecione ao menos uma categoria.")
+  .max(30, "Selecione até 30 categorias.")
+  .refine(
+    (names) => new Set(names).size === names.length,
+    "Não repita categorias.",
+  );
+
 export const recipeFormSchema = z.object({
   title: text("Nome").max(120, "Use até 120 caracteres."),
   description: text("Descrição").max(2000),
-  category: text("Categoria").max(80),
+  categories: recipeCategoriesSchema,
   time: z
     .number({ error: "Informe o tempo em minutos." })
     .int()

@@ -75,7 +75,9 @@ export default function SmartSearchPage({
             filters.find((f) => f.type === "Tempo")?.value.match(/\d+/)?.[0],
           ) || undefined,
         temperature: filters.find((f) => f.type === "Temperatura")?.value,
-        category: filters.find((f) => f.type === "Categoria")?.value,
+        categories: filters
+          .filter((f) => f.type === "Categoria")
+          .map((f) => f.value),
         flavor: filters.find((f) => f.type === "Perfil")?.value,
       };
 

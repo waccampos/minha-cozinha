@@ -58,5 +58,7 @@ export async function writeTransaction<T>(
 }
 
 export async function checkApplicationDatabase() {
-  await getDb().$queryRaw`SELECT id FROM minha_cozinha."Category" LIMIT 1`;
+  // Também exige a migration de múltiplas categorias antes de anunciar prontidão.
+  await getDb()
+    .$queryRaw`SELECT "recipeId" FROM minha_cozinha."RecipeCategory" LIMIT 1`;
 }

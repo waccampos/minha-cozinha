@@ -42,7 +42,7 @@ export default function Home() {
         : "/images/recipe-placeholder.svg",
     }));
 
-  const { navigate, openRecipe, runSearch, openPantry } =
+  const { navigate, openRecipe, runSearch, openPantry, openCategory } =
     useKitchenNavigation();
 
   const [search, setSearch] = useState("");
@@ -172,7 +172,7 @@ export default function Home() {
             <CategoryCard
               key={c.name}
               item={c}
-              onClick={() => navigate("library")}
+              onClick={() => openCategory(c.name)}
             />
           ))}
         </div>

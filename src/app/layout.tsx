@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import "@/styles/mobile.css";
 import "@/styles/recipe-prompt.css";
+import "@/styles/categories.css";
 
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";

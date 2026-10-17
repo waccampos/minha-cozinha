@@ -30,7 +30,14 @@ export default function RecipeCard({
         >
           <RecipeImage src={recipe.image} alt={recipe.title} />
         </Link>
-        <span className="category-pill">{recipe.category}</span>
+        <span
+          className="category-pill"
+          aria-label={`Categorias: ${recipe.categories.join(", ")}`}
+        >
+          {recipe.categories.length === 1
+            ? recipe.categories[0]
+            : `${recipe.categories.length} categorias`}
+        </span>
         <button
           className={`heart ${favorite ? "active" : ""}`}
           onClick={() => onFavorite?.(recipe.id)}
@@ -48,6 +55,11 @@ export default function RecipeCard({
           <h3>
             <Link href={`/receitas/${recipe.id}`}>{recipe.title}</Link>
           </h3>
+          <ul className="recipe-card-categories" aria-label="Categorias">
+            {recipe.categories.map((category) => (
+              <li key={category}>{category}</li>
+            ))}
+          </ul>
           {reason && (
             <p className="match-reason">
               <Icon name="check" size={14} />

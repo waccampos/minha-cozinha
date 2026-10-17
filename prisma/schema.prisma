@@ -21,8 +21,7 @@ model Recipe {
   reviewCount   Int               @default(0)
   notes         String            @default("")
   searchText    String            @default("")
-  categoryId    Int
-  category      Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categories    RecipeCategory[]
   imageId       String?           @db.Uuid
   image         Image?            @relation(fields: [imageId], references: [id], onDelete: SetNull)
   ingredients   Ingredient[]
@@ -36,7 +35,6 @@ model Recipe {
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
-  @@index([categoryId])
   @@index([time])
   @@index([rating], map: "recipe_rating_idx")
   @@index([temperature, flavor])
@@ -74,8 +72,19 @@ model PreparationStep {
 model Category {
   id      Int      @id @default(autoincrement())
   name    String   @unique @db.VarChar(80)
-  recipes Recipe[]
+  recipes RecipeCategory[]
 
+  @@schema("minha_cozinha")
+}
+
+model RecipeCategory {
+  recipeId   Int
+  categoryId Int
+  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@id([recipeId, categoryId])
+  @@index([categoryId])
   @@schema("minha_cozinha")
 }
 

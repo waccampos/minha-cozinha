@@ -11,7 +11,9 @@ import { recipeDto, recipeInclude } from "@/server/repositories/recipe.mapper";
 export async function findRecipePage(query: RecipeListQuery) {
   const where: Prisma.RecipeWhereInput = {
     ...(query.q ? { searchText: { contains: canonical(query.q) } } : {}),
-    ...(query.category ? { category: { name: query.category } } : {}),
+    ...(query.category
+      ? { categories: { some: { category: { name: query.category } } } }
+      : {}),
     ...(query.difficulty ? { difficulty: query.difficulty } : {}),
     ...(query.temperature ? { temperature: query.temperature } : {}),
     time: { lte: query.maxTime },
@@ -110,6 +112,17 @@ export async function persistRecipe(
     : tx.recipe.create({ data });
 }
 
+export async function replaceRecipeCategories(
+  tx: Transaction,
+  recipeId: number,
+  categoryIds: number[],
+) {
+  await tx.recipeCategory.deleteMany({ where: { recipeId } });
+  await tx.recipeCategory.createMany({
+    data: categoryIds.map((categoryId) => ({ recipeId, categoryId })),
+  });
+}
+
 export async function replaceRecipeContents(
   tx: Transaction,
   recipeId: number,
@@ -151,7 +164,7 @@ export function findRecipeSearchSource(tx: Transaction, id: number) {
   return tx.recipe.findUniqueOrThrow({
     where: { id },
     include: {
-      category: true,
+      categories: { include: { category: true } },
       ingredients: true,
       tags: { include: { tag: true } },
     },

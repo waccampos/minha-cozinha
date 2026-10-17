@@ -32,8 +32,10 @@ export async function findMatchingRecipes(parsed: ParsedSearch) {
       if (parsed.flavor)
         conditions.push(Prisma.sql`r.flavor = ${parsed.flavor}`);
 
-      if (parsed.category)
-        conditions.push(Prisma.sql`c.name = ${parsed.category}`);
+      for (const category of parsed.categories)
+        conditions.push(
+          Prisma.sql`EXISTS (SELECT 1 FROM minha_cozinha."RecipeCategory" rc JOIN minha_cozinha."Category" c ON c.id=rc."categoryId" WHERE rc."recipeId"=r.id AND c.name=${category})`,
+        );
 
       let textPredicate = Prisma.sql`TRUE`;
       let score = Prisma.sql`0`;
@@ -59,7 +61,7 @@ export async function findMatchingRecipes(parsed: ParsedSearch) {
       }
 
       const ids = await db.$queryRaw<{ id: number }[]>(
-        Prisma.sql`SELECT r.id FROM minha_cozinha."Recipe" r JOIN minha_cozinha."Category" c ON c.id=r."categoryId" WHERE ${Prisma.join(conditions, " AND ")} AND ${textPredicate} ORDER BY ${score} DESC,r."createdAt" DESC LIMIT 100`,
+        Prisma.sql`SELECT r.id FROM minha_cozinha."Recipe" r WHERE ${Prisma.join(conditions, " AND ")} AND ${textPredicate} ORDER BY ${score} DESC,r."createdAt" DESC LIMIT 100`,
       );
 
       const rows = await db.recipe.findMany({

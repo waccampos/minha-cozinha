@@ -1,0 +1,15 @@
+export const recipeValues = {
+  title: "Mousse de banana",
+  description: "Sobremesa com fruta e iogurte.",
+  categories: ["Sobremesas", "Saudáveis"],
+  time: 20,
+  servings: "2 porções",
+  difficulty: "Fácil",
+  temperature: "Gelada",
+  flavor: "Doce",
+  image: "",
+  tags: [],
+  notes: "",
+  ingredients: [{ quantity: "2", unit: "un.", name: "banana" }],
+  steps: [{ text: "Bata a banana e refrigere." }],
+};

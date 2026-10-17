@@ -15,8 +15,8 @@ export function interpretQuery(query: string): SearchFilter[] {
 
   if (parsed.flavor) filters.push({ type: "Perfil", value: parsed.flavor });
 
-  if (parsed.category)
-    filters.push({ type: "Categoria", value: parsed.category });
+  for (const value of parsed.categories)
+    filters.push({ type: "Categoria", value });
 
   if (parsed.maxTime)
     filters.push({ type: "Tempo", value: `Até ${parsed.maxTime} min` });

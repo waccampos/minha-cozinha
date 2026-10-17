@@ -30,7 +30,8 @@ export const searchInput = z.object({
     .optional(),
   maxTime: z.number().int().positive().max(1440).optional(),
   temperature: z.string().max(20).optional(),
-  category: z.string().max(80).optional(),
+  category: z.string().trim().min(1).max(80).optional(),
+  categories: z.array(z.string().trim().min(1).max(80)).max(30).optional(),
   flavor: z.string().max(20).optional(),
 });
 
