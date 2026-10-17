@@ -3,6 +3,10 @@ ARG NODE_IMAGE=node:24-bookworm-slim
 FROM ${NODE_IMAGE} AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Prisma CLI precisa detectar a mesma versão do OpenSSL no build e nas ferramentas.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base AS dependencies
 COPY package.json package-lock.json ./
@@ -23,9 +27,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update && apt-get install -y --no-install-recommends postgresql-client-${PG_MAJOR} \
     && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 1001 nextjs \
+    && useradd --system --create-home --uid 1001 --gid 1001 nextjs \
     && mkdir -p /data/images && chown -R 1001:1001 /data
-ENV NODE_ENV=production IMAGE_STORAGE_DIR=/data/images BACKUP_DIR=/backups
-USER node
+# Baixar/validar o engine nativo com o ambiente final, sem acessar o banco.
+RUN npm run db:validate \
+    && chown -R 1001:1001 /app/node_modules/@prisma/engines
+ENV NODE_ENV=production IMAGE_STORAGE_DIR=/data/images BACKUP_DIR=/backups HOME=/home/nextjs
+USER nextjs
+# Verifica as permissões com o mesmo UID usado pelo Compose.
+RUN npm run db:validate
 CMD ["npm", "run", "db:validate"]
 
 FROM base AS runner
