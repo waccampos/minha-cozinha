@@ -1,0 +1,10 @@
+{
+  "description": "Personal digital cookbook offering elegant recipe browsing, meal planning, and cooking guidance with rich visuals and intuitive navigation.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

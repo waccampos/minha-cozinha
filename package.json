@@ -1,0 +1,63 @@
+{
+  "name": "minha-cozinha",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build --webpack",
+    "start": "next start --hostname 0.0.0.0",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --conditions=react-server --test --test-isolation=none tests/*.test.ts",
+    "format": "prettier --write --ignore-unknown .",
+    "format:check": "prettier --check --ignore-unknown .",
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate",
+    "db:migrate": "node --import tsx scripts/migrate.ts",
+    "images:cleanup": "node --import tsx --conditions=react-server scripts/cleanup-images.ts",
+    "backup": "node --import tsx scripts/backup.ts",
+    "restore": "node --import tsx scripts/restore.ts",
+    "test:integration": "node --import tsx --conditions=react-server --test --test-isolation=none tests/integration.test.ts",
+    "assets:vendor": "node --import tsx scripts/vendor-assets.ts",
+    "backup:verify": "node --import tsx scripts/verify-backup.ts",
+    "security:check": "node --import tsx scripts/security-check.ts",
+    "security:update": "node scripts/update-security.mjs",
+    "db:provision": "node --import tsx scripts/provision-database.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "5.2.2",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "dotenv": "^16.4.7",
+    "lucide-react": "0.563.0",
+    "next": "16.1.4",
+    "pg": "^8.20.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-hook-form": "7.71.1",
+    "server-only": "^0.0.1",
+    "sharp": "0.35.5",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.18",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "9.39.2",
+    "eslint-config-next": "16.1.4",
+    "prettier": "3.6.2",
+    "prisma": "^7.5.0",
+    "tailwindcss": "4.1.18",
+    "tsx": "^4.20.0",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "sharp": "0.35.5"
+  }
+}

@@ -1,0 +1,20 @@
+export type Recipe = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+  time: number;
+  difficulty: "Fácil" | "Médio" | "Avançado";
+  rating: number;
+  reviews: number;
+  servings: string;
+  temperature: string;
+  flavor: string;
+  favorite: boolean;
+  tags: string[];
+  ingredients: string[];
+  ingredientDetails?: { quantity: string; unit: string; name: string }[];
+  steps: string[];
+  notes?: string;
+};

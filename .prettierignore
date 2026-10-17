@@ -1,0 +1,11 @@
+node_modules
+.next
+src/generated
+package-lock.json
+AGENTS.md
+CLAUDE.md
+.env*
+prisma/schema.prisma
+prisma/migrations
+storage
+backups

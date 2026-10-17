@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["minha_cozinha"]
+}
+
+model Recipe {
+  id            Int               @id @default(autoincrement())
+  title         String            @db.VarChar(120)
+  description   String
+  time          Int
+  servings      String            @db.VarChar(120)
+  difficulty    String            @db.VarChar(20)
+  temperature   String            @db.VarChar(20)
+  flavor        String            @db.VarChar(20)
+  rating        Float             @default(0)
+  reviewCount   Int               @default(0)
+  notes         String            @default("")
+  searchText    String            @default("")
+  categoryId    Int
+  category      Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  imageId       String?           @db.Uuid
+  image         Image?            @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  ingredients   Ingredient[]
+  steps         PreparationStep[]
+  tags          RecipeTag[]
+  favorite      Favorite?
+  reviews       Review[]
+  preparations  Preparation[]
+  meals         PlanningEntry[]
+  shoppingItems ShoppingItem[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([categoryId])
+  @@index([time])
+  @@index([rating], map: "recipe_rating_idx")
+  @@index([temperature, flavor])
+  @@index([imageId])
+  @@index([createdAt])
+  @@schema("minha_cozinha")
+}
+
+model Ingredient {
+  id         Int    @id @default(autoincrement())
+  recipeId   Int
+  recipe     Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  position   Int
+  quantity   String @default("") @db.VarChar(80)
+  unit       String @default("") @db.VarChar(40)
+  name       String @db.VarChar(200)
+  normalized String
+
+  @@unique([recipeId, position])
+  @@index([normalized])
+  @@schema("minha_cozinha")
+}
+
+model PreparationStep {
+  id       Int    @id @default(autoincrement())
+  recipeId Int
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  position Int
+  text     String
+
+  @@unique([recipeId, position])
+  @@schema("minha_cozinha")
+}
+
+model Category {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique @db.VarChar(80)
+  recipes Recipe[]
+
+  @@schema("minha_cozinha")
+}
+
+model Tag {
+  id      Int         @id @default(autoincrement())
+  name    String      @unique @db.VarChar(80)
+  recipes RecipeTag[]
+
+  @@schema("minha_cozinha")
+}
+
+model RecipeTag {
+  recipeId Int
+  tagId    Int
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, tagId])
+  @@index([tagId])
+  @@schema("minha_cozinha")
+}
+
+model Favorite {
+  recipeId  Int      @id
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@schema("minha_cozinha")
+}
+
+model Preparation {
+  id        String   @id @default(uuid()) @db.Uuid
+  recipeId  Int
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  notes     String   @default("")
+  review    Review?
+  createdAt DateTime @default(now())
+
+  @@index([recipeId, date])
+  @@schema("minha_cozinha")
+}
+
+model Review {
+  id            String      @id @default(uuid()) @db.Uuid
+  recipeId      Int
+  recipe        Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  preparationId String      @unique @db.Uuid
+  preparation   Preparation @relation(fields: [preparationId], references: [id], onDelete: Cascade)
+  rating        Int
+  experience    String
+  changes       String      @default("")
+  imageId       String?     @db.Uuid
+  image         Image?      @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([recipeId, createdAt])
+  @@index([imageId])
+  @@schema("minha_cozinha")
+}
+
+model PlanningEntry {
+  id       String   @id @default(uuid()) @db.Uuid
+  date     DateTime @db.Date
+  meal     Int
+  recipeId Int
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([date, meal])
+  @@index([recipeId])
+  @@schema("minha_cozinha")
+}
+
+model ShoppingList {
+  id        String         @id @default(uuid()) @db.Uuid
+  name      String         @db.VarChar(120)
+  items     ShoppingItem[]
+  current   Boolean        @default(false)
+  createdAt DateTime       @default(now())
+
+  @@schema("minha_cozinha")
+}
+
+model ShoppingItem {
+  id        String       @id @default(uuid()) @db.Uuid
+  listId    String       @db.Uuid
+  list      ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  label     String       @db.VarChar(300)
+  group     String       @default("Outros") @db.VarChar(80)
+  checked   Boolean      @default(false)
+  recipeId  Int?
+  recipe    Recipe?      @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  createdAt DateTime     @default(now())
+
+  @@index([listId, checked])
+  @@index([recipeId])
+  @@schema("minha_cozinha")
+}
+
+model Image {
+  id        String   @id @default(uuid()) @db.Uuid
+  fileName  String   @unique @db.VarChar(80)
+  mimeType  String   @db.VarChar(30)
+  bytes     Int
+  width     Int
+  height    Int
+  createdAt DateTime @default(now())
+  recipes   Recipe[]
+  reviews   Review[]
+
+  @@index([createdAt])
+  @@schema("minha_cozinha")
+}

@@ -1,0 +1,76 @@
+name: minha-cozinha
+services:
+  app:
+    image: minha-cozinha:${APP_IMAGE_TAG:-local}
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-}
+      APP_ORIGINS: ${APP_ORIGINS:-}
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      IMAGE_STORAGE_DIR: /data/images
+    # Por padrão só loopback. Defina LAN_BIND_IP com o IP privado do servidor para acesso LAN.
+    ports:
+      - "${LAN_BIND_IP:-127.0.0.1}:${APP_PORT:-3000}:3000"
+    volumes:
+      - kitchen_data:/data
+      - next_cache:/app/.next/cache
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    pids_limit: 256
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health',{signal:AbortSignal.timeout(8000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+
+  tools:
+    image: minha-cozinha-tools:${APP_IMAGE_TAG:-local}
+    build:
+      context: .
+      target: tools
+      args:
+        PG_MAJOR: "${PG_MAJOR:-17}"
+    profiles: [tools]
+    env_file: ${APP_ENV_FILE:-.env}
+    environment:
+      NODE_ENV: production
+      IMAGE_STORAGE_DIR: /data/images
+      BACKUP_DIR: /backups
+    # Mesmo UID da aplicação para acessar os volumes sem permissões globais.
+    user: "1001:1001"
+    volumes:
+      - kitchen_data:/data
+      - "${BACKUP_HOST_DIR:-./backups}:/backups"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    command: ["npm", "run", "db:validate"]
+volumes:
+  kitchen_data:
+    name: minha-cozinha-data
+  next_cache:
+    name: minha-cozinha-cache
