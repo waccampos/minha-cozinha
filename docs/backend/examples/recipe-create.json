@@ -1,0 +1,24 @@
+{
+  "type": "recipe.save",
+  "values": {
+    "title": "Banana com canela",
+    "description": "Uma sobremesa rápida feita na frigideira.",
+    "categories": ["Sobremesas"],
+    "time": 10,
+    "servings": "2 porções",
+    "difficulty": "Fácil",
+    "temperature": "Quente",
+    "flavor": "Doce",
+    "image": "",
+    "ingredients": [
+      { "quantity": "2", "unit": "un.", "name": "banana" },
+      { "quantity": "1", "unit": "colher de chá", "name": "canela" }
+    ],
+    "steps": [
+      { "text": "Corte as bananas ao meio." },
+      { "text": "Aqueça em uma frigideira antiaderente e finalize com canela." }
+    ],
+    "tags": ["rápida"],
+    "notes": "Use bananas maduras."
+  }
+}
