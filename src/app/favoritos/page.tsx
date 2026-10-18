@@ -1,4 +1,4 @@
-import Screen from "@/components/pages/recipe-library";
+import Screen from "@/components/pages/recipe-library/recipe-library.page";
 
 export const metadata = { title: "Favoritos" };
 

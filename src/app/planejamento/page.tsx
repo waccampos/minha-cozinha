@@ -1,4 +1,4 @@
-import Screen from "@/components/pages/weekly-planner";
+import Screen from "@/components/pages/weekly-planner/weekly-planner.page";
 
 export const metadata = { title: "Planejamento" };
 

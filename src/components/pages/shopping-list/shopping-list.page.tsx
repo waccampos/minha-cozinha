@@ -1,40 +1,37 @@
 "use client";
 
-import { useState } from "react";
-
 import RecipeImage from "@/components/common/recipe-image";
 import Button from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import Modal from "@/components/ui/modal";
-import { useKitchen } from "@/hooks/use-kitchen";
-import type { ShoppingItem } from "@/types/kitchen";
+
+import useShoppingListController from "./shopping-list.controller";
 
 export default function Shopping() {
   const {
-    recipes,
-    shoppingItems,
     lists,
     currentListId,
-    addShopping,
+    currentListName,
     clearPurchased,
-    command,
     pending,
-  } = useKitchen();
-
-  const [dialog, setDialog] = useState<
-    "add" | "new" | "rename" | "delete" | null
-  >(null);
-
-  const [editing, setEditing] = useState<ShoppingItem | null>(null);
-  const groups = [...new Set(shoppingItems.map((i) => i.group))].map(
-    (name) => ({ name, items: shoppingItems.filter((i) => i.group === name) }),
-  );
-
-  const completed = shoppingItems.filter((i) => i.checked).length;
-  const total = shoppingItems.length;
-  const planned = recipes.filter((r) =>
-    shoppingItems.some((i) => i.recipeId === r.id),
-  );
+    dialog,
+    openDialog,
+    closeDialog,
+    editing,
+    editItem,
+    closeEditing,
+    groups,
+    completed,
+    total,
+    planned,
+    selectList,
+    toggleItem,
+    deleteList,
+    saveList,
+    saveItem,
+    deleteItem,
+    progress,
+  } = useShoppingListController();
 
   return (
     <main className="shell page shopping-page">
@@ -44,7 +41,7 @@ export default function Shopping() {
           <h1>Lista de compras</h1>
           <p>Ingredientes de {planned.length} receitas planejadas.</p>
         </div>
-        <Button icon="plus" onClick={() => setDialog("add")}>
+        <Button icon="plus" onClick={() => openDialog("add")}>
           Adicionar item
         </Button>
       </div>
@@ -56,9 +53,7 @@ export default function Shopping() {
           id="shopping-list-select"
           value={currentListId ?? ""}
           disabled={pending}
-          onChange={(e) =>
-            void command({ type: "list.select", id: e.target.value })
-          }
+          onChange={selectList}
         >
           <option value="" disabled>
             Escolha uma lista
@@ -69,15 +64,21 @@ export default function Shopping() {
             </option>
           ))}
         </select>
-        <button className="text-action" onClick={() => setDialog("new")}>
+        <button className="text-action" onClick={() => openDialog("new")}>
           Nova lista
         </button>
         {currentListId && (
           <>
-            <button className="text-action" onClick={() => setDialog("rename")}>
+            <button
+              className="text-action"
+              onClick={() => openDialog("rename")}
+            >
               Renomear
             </button>
-            <button className="text-action" onClick={() => setDialog("delete")}>
+            <button
+              className="text-action"
+              onClick={() => openDialog("delete")}
+            >
               Excluir lista
             </button>
           </>
@@ -96,9 +97,7 @@ export default function Shopping() {
               aria-valuemin={0}
               aria-valuemax={Math.max(total, 1)}
             >
-              <i
-                style={{ width: `${total ? (completed / total) * 100 : 0}%` }}
-              />
+              <i style={{ width: `${progress}%` }} />
             </div>
           </div>
           {!total && (
@@ -121,25 +120,18 @@ export default function Shopping() {
                       checked={item.checked}
                       disabled={pending}
                       onChange={(event) =>
-                        void command({
-                          type: "shopping.update",
-                          id: item.id,
-                          checked: event.target.checked,
-                        })
+                        toggleItem(item.id, event.target.checked)
                       }
                     />
                     <span>
                       <Icon name="check" size={14} />
                     </span>
                     <p>{item.label}</p>
-                    <small>
-                      {recipes.find((r) => r.id === item.recipeId)?.title ??
-                        "Lista da cozinha"}
-                    </small>
+                    <small>{item.recipeTitle}</small>
                   </label>
                   <button
                     className="text-action"
-                    onClick={() => setEditing(item)}
+                    onClick={() => editItem(item)}
                     aria-label={`Editar ${item.label}`}
                   >
                     <Icon name="edit" size={16} />
@@ -177,69 +169,20 @@ export default function Shopping() {
                   ? "Renomear lista"
                   : "Excluir lista"
           }
-          onClose={() => setDialog(null)}
+          onClose={closeDialog}
         >
           {dialog === "delete" ? (
             <>
               <p>Excluir esta lista e todos os seus itens?</p>
               <div className="review-actions">
-                <Button variant="ghost" onClick={() => setDialog(null)}>
+                <Button variant="ghost" onClick={closeDialog}>
                   Cancelar
                 </Button>
-                <Button
-                  onClick={async () => {
-                    if (
-                      currentListId &&
-                      (await command({
-                        type: "list.delete",
-                        id: currentListId,
-                      }))
-                    )
-                      setDialog(null);
-                  }}
-                >
-                  Excluir
-                </Button>
+                <Button onClick={deleteList}>Excluir</Button>
               </div>
             </>
           ) : (
-            <form
-              onSubmit={async (event) => {
-                event.preventDefault();
-
-                const value = String(
-                  new FormData(event.currentTarget).get("value") ?? "",
-                ).trim();
-
-                if (!value) return;
-
-                let ok = false;
-
-                if (dialog === "add") ok = await addShopping(value);
-                else {
-                  const result = await command({
-                    type: "list.save",
-                    id:
-                      dialog === "rename"
-                        ? (currentListId ?? undefined)
-                        : undefined,
-                    name: value,
-                  });
-
-                  if (result) {
-                    ok = true;
-
-                    if (dialog === "new" && result.id)
-                      ok = !!(await command({
-                        type: "list.select",
-                        id: String(result.id),
-                      }));
-                  }
-                }
-
-                if (ok) setDialog(null);
-              }}
-            >
+            <form onSubmit={saveList}>
               <div className="field">
                 <label htmlFor="shopping-value">
                   {dialog === "add" ? "Item" : "Nome da lista"}
@@ -249,15 +192,11 @@ export default function Shopping() {
                   name="value"
                   required
                   maxLength={dialog === "add" ? 300 : 120}
-                  defaultValue={
-                    dialog === "rename"
-                      ? lists.find((l) => l.id === currentListId)?.name
-                      : ""
-                  }
+                  defaultValue={dialog === "rename" ? currentListName : ""}
                 />
               </div>
               <div className="review-actions">
-                <Button variant="ghost" onClick={() => setDialog(null)}>
+                <Button variant="ghost" onClick={closeDialog}>
                   Cancelar
                 </Button>
                 <button
@@ -273,24 +212,8 @@ export default function Shopping() {
         </Modal>
       )}
       {editing && (
-        <Modal title="Editar item" onClose={() => setEditing(null)}>
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-
-              const form = new FormData(event.currentTarget);
-
-              if (
-                await command({
-                  type: "shopping.update",
-                  id: editing.id,
-                  label: String(form.get("label")),
-                  group: String(form.get("group")),
-                })
-              )
-                setEditing(null);
-            }}
-          >
+        <Modal title="Editar item" onClose={closeEditing}>
+          <form onSubmit={saveItem}>
             <div className="field">
               <label htmlFor="item-label">Item</label>
               <input
@@ -310,18 +233,10 @@ export default function Shopping() {
               />
             </div>
             <div className="review-actions">
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  if (
-                    await command({ type: "shopping.delete", id: editing.id })
-                  )
-                    setEditing(null);
-                }}
-              >
+              <Button variant="ghost" onClick={deleteItem}>
                 Excluir item
               </Button>
-              <Button variant="ghost" onClick={() => setEditing(null)}>
+              <Button variant="ghost" onClick={closeEditing}>
                 Cancelar
               </Button>
               <button

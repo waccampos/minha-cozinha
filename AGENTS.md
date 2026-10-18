@@ -37,6 +37,7 @@ This project uses **Tailwind CSS v4** through the `@tailwindcss/vite` plugin con
 ## Code quality
 
 - Declare component props in a named `type` or `interface` above the component (for example, `type RecipeCardProps = { ... }`). Do not declare props object types inline in component parameters.
+- Organize every screen under `src/components/pages/<name>/` with `<name>.page.tsx` for JSX/presentation and `<name>.controller.ts` (or `.tsx` if necessary) for its `use<Name>Controller` hook. Keep state, effects, requests, mutations, event handlers and data preparation in the controller. Pages bind events and render the returned view data. Preserve this separation when adding screens.
 - Use double quotes for strings containing apostrophes (`"We're here to help"`), or escape them in single-quoted strings. An unescaped apostrophe in a single-quoted string breaks the build.
 - Ensure JSX tags are closed and braces are balanced.
 - Export components as default exports.

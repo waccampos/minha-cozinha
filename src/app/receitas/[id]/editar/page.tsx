@@ -1,4 +1,4 @@
-import RecipeRoute from "@/components/pages/recipe-page";
+import RecipeRoute from "@/components/pages/recipe-route/recipe-route.page";
 
 export const metadata = { title: "Editar receita" };
 

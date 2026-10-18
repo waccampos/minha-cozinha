@@ -1,4 +1,4 @@
-import Screen from "@/components/pages/home";
+import Screen from "@/components/pages/home/home.page";
 
 export const metadata = { title: "Início" };
 

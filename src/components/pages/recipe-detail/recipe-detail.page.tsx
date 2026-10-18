@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 import IngredientList from "@/components/common/ingredient-list";
 import RecipeImage from "@/components/common/recipe-image";
@@ -11,9 +10,9 @@ import Icon from "@/components/ui/icon";
 import Modal from "@/components/ui/modal";
 import RatingStars from "@/components/ui/rating-stars";
 import SectionHeading from "@/components/ui/section-heading";
-import { useKitchen } from "@/hooks/use-kitchen";
-import useKitchenNavigation from "@/hooks/use-kitchen-navigation";
 import type { Preparation, Review } from "@/types/kitchen";
+
+import useRecipeDetailController from "./recipe-detail.controller";
 import type { Recipe } from "@/types/recipe";
 
 type DetailProps = {
@@ -24,17 +23,30 @@ type DetailProps = {
 
 export default function Detail({ recipe, reviews, preparations }: DetailProps) {
   const {
-    favorites: favoriteIds,
-    toggleFavorite: onFavorite,
-    command,
     pending,
-  } = useKitchen();
-
-  const [deleting, setDeleting] = useState(false);
-  const [editPrep, setEditPrep] = useState<Preparation | null>(null);
-  const [deleteReview, setDeleteReview] = useState<string | null>(null);
-  const favorite = favoriteIds.includes(recipe.id);
-  const { navigate } = useKitchenNavigation(recipe.id);
+    deleting,
+    editPrep,
+    deleteReview,
+    favorite,
+    recipeReviews,
+    unreviewedPreparations,
+    formatPreparationDate,
+    startCooking,
+    reviewRecipe,
+    editRecipe,
+    toggleFavorite,
+    openRecipeDeletion,
+    closeRecipeDeletion,
+    openReviewDeletion,
+    closeReviewDeletion,
+    editPreparation,
+    closePreparationEditing,
+    editReviewPreparation,
+    confirmRecipeDeletion,
+    confirmReviewDeletion,
+    savePreparation,
+    deletePreparation,
+  } = useRecipeDetailController(recipe, reviews, preparations);
 
   return (
     <main className="detail-page">
@@ -80,19 +92,15 @@ export default function Detail({ recipe, reviews, preparations }: DetailProps) {
             </div>
           </div>
           <div className="detail-actions">
-            <Button onClick={() => navigate("cooking")} icon="play">
+            <Button onClick={startCooking} icon="play">
               Iniciar preparo
             </Button>
-            <Button
-              variant="soft"
-              onClick={() => navigate("review")}
-              icon="star"
-            >
+            <Button variant="soft" onClick={reviewRecipe} icon="star">
               Avaliar
             </Button>
             <button
               className={`icon-btn detail-heart ${favorite ? "active" : ""}`}
-              onClick={() => onFavorite(recipe.id)}
+              onClick={toggleFavorite}
               aria-label={
                 favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"
               }
@@ -102,12 +110,12 @@ export default function Detail({ recipe, reviews, preparations }: DetailProps) {
             </button>
             <button
               className="icon-btn"
-              onClick={() => navigate("form")}
+              onClick={editRecipe}
               aria-label="Editar receita"
             >
               <Icon name="edit" />
             </button>
-            <button className="text-action" onClick={() => setDeleting(true)}>
+            <button className="text-action" onClick={openRecipeDeletion}>
               Excluir receita
             </button>
           </div>
@@ -155,157 +163,100 @@ export default function Detail({ recipe, reviews, preparations }: DetailProps) {
             eyebrow="Diário da receita"
             title="Seus últimos preparos"
             action="Registrar preparo"
-            onAction={() => navigate("review")}
+            onAction={reviewRecipe}
           />
           <div className="history-grid">
-            {reviews
-              .filter((item) => item.recipeId === recipe.id)
-              .map((item) => (
-                <article key={item.id}>
-                  <div>
-                    <strong>
-                      {new Intl.DateTimeFormat("pt-BR", {
-                        dateStyle: "long",
-                        timeZone: "UTC",
-                      }).format(new Date(`${item.date}T12:00:00Z`))}
-                    </strong>
-                    <RatingStars value={item.rating} />
-                  </div>
-                  <p>{item.experience}</p>
-                  {item.changes && <p>{item.changes}</p>}
-                  {item.image && (
-                    <RecipeImage
-                      className="review-photo"
-                      src={item.image}
-                      alt="Resultado do preparo"
-                    />
-                  )}
-                  <div className="history-actions">
-                    <Link
-                      className="text-action"
-                      href={`/receitas/${recipe.id}/avaliar?avaliacao=${item.id}`}
-                    >
-                      Editar avaliação
-                    </Link>
-                    <button
-                      className="text-action"
-                      onClick={() => setDeleteReview(item.id)}
-                    >
-                      Excluir avaliação
-                    </button>
-                    <button
-                      className="text-action"
-                      onClick={() =>
-                        setEditPrep(
-                          preparations.find(
-                            (p) => p.id === item.preparationId,
-                          ) ?? null,
-                        )
-                      }
-                    >
-                      Editar preparo
-                    </button>
-                  </div>
-                </article>
-              ))}
-            {preparations
-              .filter((p) => p.recipeId === recipe.id && !p.reviewId)
-              .map((p) => (
-                <article key={p.id}>
-                  <strong>
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      dateStyle: "long",
-                      timeZone: "UTC",
-                    }).format(new Date(`${p.date}T12:00:00Z`))}
-                  </strong>
-                  <p>{p.notes || "Preparo concluído, ainda sem avaliação."}</p>
-                  <div className="history-actions">
-                    <Link
-                      className="text-action"
-                      href={`/receitas/${recipe.id}/avaliar?preparo=${p.id}`}
-                    >
-                      Avaliar preparo
-                    </Link>
-                    <button
-                      className="text-action"
-                      onClick={() => setEditPrep(p)}
-                    >
-                      Editar preparo
-                    </button>
-                  </div>
-                </article>
-              ))}
+            {recipeReviews.map((item) => (
+              <article key={item.id}>
+                <div>
+                  <strong>{formatPreparationDate(item.date)}</strong>
+                  <RatingStars value={item.rating} />
+                </div>
+                <p>{item.experience}</p>
+                {item.changes && <p>{item.changes}</p>}
+                {item.image && (
+                  <RecipeImage
+                    className="review-photo"
+                    src={item.image}
+                    alt="Resultado do preparo"
+                  />
+                )}
+                <div className="history-actions">
+                  <Link
+                    className="text-action"
+                    href={`/receitas/${recipe.id}/avaliar?avaliacao=${item.id}`}
+                  >
+                    Editar avaliação
+                  </Link>
+                  <button
+                    className="text-action"
+                    onClick={() => openReviewDeletion(item.id)}
+                  >
+                    Excluir avaliação
+                  </button>
+                  <button
+                    className="text-action"
+                    onClick={() => editReviewPreparation(item.preparationId)}
+                  >
+                    Editar preparo
+                  </button>
+                </div>
+              </article>
+            ))}
+            {unreviewedPreparations.map((p) => (
+              <article key={p.id}>
+                <strong>{formatPreparationDate(p.date)}</strong>
+                <p>{p.notes || "Preparo concluído, ainda sem avaliação."}</p>
+                <div className="history-actions">
+                  <Link
+                    className="text-action"
+                    href={`/receitas/${recipe.id}/avaliar?preparo=${p.id}`}
+                  >
+                    Avaliar preparo
+                  </Link>
+                  <button
+                    className="text-action"
+                    onClick={() => editPreparation(p)}
+                  >
+                    Editar preparo
+                  </button>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
       {deleting && (
-        <Modal title="Excluir receita" onClose={() => setDeleting(false)}>
+        <Modal title="Excluir receita" onClose={closeRecipeDeletion}>
           <p>
             Excluir esta receita, seus preparos, avaliações e refeições
             planejadas? Esta ação não pode ser desfeita.
           </p>
           <div className="review-actions">
-            <Button variant="ghost" onClick={() => setDeleting(false)}>
+            <Button variant="ghost" onClick={closeRecipeDeletion}>
               Cancelar
             </Button>
-            <Button
-              onClick={async () => {
-                if (
-                  !pending &&
-                  (await command({ type: "recipe.delete", id: recipe.id }))
-                )
-                  navigate("library");
-              }}
-            >
-              Excluir receita
-            </Button>
+            <Button onClick={confirmRecipeDeletion}>Excluir receita</Button>
           </div>
         </Modal>
       )}
       {deleteReview && (
-        <Modal title="Excluir avaliação" onClose={() => setDeleteReview(null)}>
+        <Modal title="Excluir avaliação" onClose={closeReviewDeletion}>
           <p>
             Excluir esta avaliação? O registro do preparo será mantido no
             diário.
           </p>
           <div className="review-actions">
-            <Button variant="ghost" onClick={() => setDeleteReview(null)}>
+            <Button variant="ghost" onClick={closeReviewDeletion}>
               Cancelar
             </Button>
-            <Button
-              onClick={async () => {
-                if (
-                  !pending &&
-                  (await command({ type: "review.delete", id: deleteReview }))
-                )
-                  setDeleteReview(null);
-              }}
-            >
-              Excluir avaliação
-            </Button>
+            <Button onClick={confirmReviewDeletion}>Excluir avaliação</Button>
           </div>
         </Modal>
       )}
       {editPrep && (
-        <Modal title="Editar preparo" onClose={() => setEditPrep(null)}>
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-
-              const data = new FormData(event.currentTarget);
-
-              if (
-                await command({
-                  type: "preparation.save",
-                  id: editPrep.id,
-                  recipeId: recipe.id,
-                  date: String(data.get("date")),
-                  notes: String(data.get("notes")),
-                })
-              )
-                setEditPrep(null);
-            }}
-          >
+        <Modal title="Editar preparo" onClose={closePreparationEditing}>
+          <form onSubmit={savePreparation}>
             <div className="field">
               <label htmlFor="prep-date">Data</label>
               <input
@@ -326,23 +277,12 @@ export default function Detail({ recipe, reviews, preparations }: DetailProps) {
             <details>
               <summary>Excluir preparo</summary>
               <p>Remove também a avaliação deste preparo.</p>
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  if (
-                    await command({
-                      type: "preparation.delete",
-                      id: editPrep.id,
-                    })
-                  )
-                    setEditPrep(null);
-                }}
-              >
+              <Button variant="ghost" onClick={deletePreparation}>
                 Confirmar exclusão do preparo
               </Button>
             </details>
             <div className="review-actions">
-              <Button variant="ghost" onClick={() => setEditPrep(null)}>
+              <Button variant="ghost" onClick={closePreparationEditing}>
                 Cancelar
               </Button>
               <button

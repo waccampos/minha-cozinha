@@ -2,22 +2,11 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-import RecipeMissing from "@/components/common/recipe-missing";
-import RecipeForm from "@/components/forms/recipe-form";
-import ReviewPage from "@/components/forms/review-form";
-import CookingMode from "@/components/pages/cooking-mode";
-import Detail from "@/components/pages/recipe-detail";
 import { useKitchen } from "@/hooks/use-kitchen";
 import type { Review, Preparation } from "@/types/kitchen";
 import type { Recipe } from "@/types/recipe";
 
-type RecipeRouteProps = {
-  id: string;
-  view: "detail" | "cooking" | "form" | "review";
-};
-
-export default function RecipeRoute({ id, view }: RecipeRouteProps) {
+export default function useRecipeRouteController(id: string) {
   const params = useSearchParams();
   const { recipes } = useKitchen();
   const [data, setData] = useState<{
@@ -67,43 +56,15 @@ export default function RecipeRoute({ id, view }: RecipeRouteProps) {
     return () => controller.abort();
   }, [id, recipes]);
 
-  if (missing && !recipes.some((r) => r.id === Number(id)))
-    return <RecipeMissing />;
-
-  if (!data)
-    return (
-      <main className="shell page">
-        <p role={error ? "alert" : "status"}>
-          {error || "Carregando receita…"}
-        </p>
-      </main>
-    );
-
-  const { recipe, reviews, preparations } = data;
-
-  if (!recipe) return <RecipeMissing />;
-
-  if (view === "form") return <RecipeForm key={recipe.id} recipe={recipe} />;
-
-  if (view === "review")
-    return (
-      <ReviewPage
-        key={params.get("avaliacao") ?? "new"}
-        recipe={recipe}
-        review={reviews.find(
-          (r) => r.id === params.get("avaliacao") && r.recipeId === recipe.id,
-        )}
-      />
-    );
-
-  if (view === "cooking") return <CookingMode recipe={recipe} />;
-
-  return (
-    <>
-      <p className="sr-only" role="alert">
-        {error}
-      </p>
-      <Detail recipe={recipe} reviews={reviews} preparations={preparations} />
-    </>
+  const reviewKey = params.get("avaliacao") ?? "new";
+  const selectedReview = data?.reviews.find(
+    (review) =>
+      review.id === params.get("avaliacao") &&
+      review.recipeId === data.recipe.id,
   );
+
+  const isMissing =
+    missing && !recipes.some((recipe) => recipe.id === Number(id));
+
+  return { data, error, isMissing, reviewKey, selectedReview };
 }

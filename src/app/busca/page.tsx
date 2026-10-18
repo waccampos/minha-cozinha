@@ -1,4 +1,4 @@
-import Screen from "@/components/pages/search-page";
+import Screen from "@/components/pages/search/search.page";
 
 export const metadata = { title: "Busca" };
 
