@@ -7,30 +7,6 @@ import { DomainError, publicError } from "@/lib/errors";
 import { logContext } from "./log-context";
 import { log, logFailure } from "./logger";
 
-export function assertSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  const url = new URL(request.url);
-  const host = request.headers.get("host");
-  const fetchSite = request.headers.get("sec-fetch-site");
-  const allowed = (process.env.APP_ORIGINS ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-  if (!origin || origin === "null" || fetchSite === "cross-site")
-    throw new DomainError("Origem da solicitação não permitida.", 403);
-
-  // O proxy pode deixar request.url com o endereço interno do Next.
-  // Host cobre HTTP local; Fetch Metadata cobre HTTPS com terminação no proxy.
-  const sameOrigin =
-    origin === url.origin ||
-    (host !== null && origin === `${url.protocol}//${host}`) ||
-    fetchSite === "same-origin";
-
-  if (!sameOrigin && !allowed.includes(origin))
-    throw new DomainError("Origem da solicitação não permitida.", 403);
-}
-
 export function errorResponse(error: unknown) {
   const value = publicError(error);
 

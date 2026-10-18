@@ -1,5 +1,5 @@
 import { DomainError } from "@/lib/errors";
-import { assertSameOrigin, withRequestLog } from "@/server/http";
+import { withRequestLog } from "@/server/http";
 import { setLogOperation } from "@/server/log-context";
 import { commandOperation } from "@/server/logger";
 import { readKitchen } from "@/server/repositories/kitchen.repository";
@@ -16,8 +16,6 @@ export const GET = withRequestLog("/api/kitchen", async () => {
 });
 
 export const POST = withRequestLog("/api/kitchen", async (request) => {
-  assertSameOrigin(request);
-
   if (!request.headers.get("content-type")?.includes("application/json"))
     throw new DomainError("Envie JSON.", 415);
 
