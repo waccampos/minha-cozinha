@@ -162,6 +162,20 @@ Programe rotação dos logs e retenção dos backups conforme espaço/RPO deseja
 4. Pare o app para migrations incompatíveis; execute manualmente `db:migrate` e os grants necessários.
 5. `docker compose up -d --no-deps app`; confira healthcheck, abertura da página, uma receita e uma imagem.
 
+Quando não houver migrations pendentes, execute build e atualização com `&&`
+para só trocar o container se as duas imagens forem construídas com sucesso:
+
+```sh
+docker compose build app tools && docker compose up -d --no-deps app
+```
+
+Se o build falhar em `npm ci` com `Invalid Version` ou dependências ausentes,
+o lockfile precisa ser corrigido e versionado antes de repetir o deploy.
+Gere-o em um diretório sem `node_modules`, usando o Node/npm da imagem de
+build, e valide com `npm ci` em ambiente limpo. `npm test` também verifica
+o lockfile sem rede e sem executar scripts de instalação. Mantenha `npm ci`
+no Dockerfile para instalar as versões revisadas.
+
 O volume nomeado mantém o conteúdo. **Não use `docker compose down -v`, `docker volume rm` ou comandos prune com volumes.** Rollback de imagem exige compatibilidade com o schema atual; alterações de dados/estrutura podem exigir restauração confirmada do backup. Não há downgrade automático.
 
 ## 10. Performance, falhas e observabilidade

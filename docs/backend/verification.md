@@ -1,6 +1,28 @@
-# Verificação — 17/10/2026
+# Verificação
 
-## Evidências locais
+## Correção do build de dependências — 18/10/2026
+
+O lockfile continha duas entradas opcionais do Sharp sem versão e uma árvore
+incompleta de dependências de WebAssembly. O erro `Invalid Version` foi
+reproduzido. A geração foi feita em diretório limpo com o Node/npm da imagem
+`node:24-bookworm-slim`, sem reutilizar `node_modules` da máquina local.
+Next e eslint-config-next foram alinhados em 16.4.1, versão exigida pela
+política de deploy já existente.
+
+- 48 testes passaram; 1 integração com PostgreSQL permaneceu desativada.
+- O teste novo executa `npm ci --dry-run --ignore-scripts --offline` em
+  diretório temporário com cache vazio para verificar a instalação limpa.
+- Instalação limpa com scripts e validação da resolução para Linux ARM64
+  passaram; o hardware Orange Pi não foi acessado.
+- Lint, TypeScript, política interna de dependências e build Next passaram.
+- Os targets Docker `runner` e `tools` foram construídos com sucesso,
+  incluindo `npm ci`, geração Prisma, build Next e validação do schema como
+  UID 1001 na imagem de ferramentas. Nenhum container da aplicação foi iniciado.
+- `npm audit --omit=dev` apontou 15 vulnerabilidades transitivas na árvore
+  do Prisma (5 moderadas e 10 altas). Essa auditoria permanece pendente de
+  tratamento; passar na política interna não equivale a uma auditoria limpa.
+
+## Evidências locais — 17/10/2026
 
 | Verificação                               | Resultado                                                        |
 | ----------------------------------------- | ---------------------------------------------------------------- |
