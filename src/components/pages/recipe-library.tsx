@@ -23,6 +23,8 @@ export default function Library({
   const { favorites: favoriteIds, toggleFavorite: onFavorite } = useKitchen();
 
   const favorites = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+  // Polling replaces the array even when the favorite IDs haven't changed.
+  const favoritesKey = favoriteIds.join(",");
 
   const { openRecipe } = useKitchenNavigation();
   const [search, setSearch] = useState("");
@@ -95,7 +97,7 @@ export default function Library({
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [page, search, filters, sort, favoritesOnly, favoriteIds]);
+  }, [page, search, filters, sort, favoritesOnly, favoritesKey]);
 
   const results = result.items;
 
@@ -185,9 +187,10 @@ export default function Library({
         <div className="library-results">
           <div className="results-count">
             <strong>{result.total} receitas</strong>
-            <span>na sua coleção</span>
+            <span role="status">
+              {loading ? "Carregando receitas…" : "na sua coleção"}
+            </span>
           </div>
-          {loading && <p role="status">Carregando receitas…</p>}
           {error && (
             <p role="alert" className="field-error">
               {error}

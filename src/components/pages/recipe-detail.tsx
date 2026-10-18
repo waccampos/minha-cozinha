@@ -133,7 +133,9 @@ export default function Detail({
           <div className="tip-card">
             <p className="eyebrow">Notas da cozinha</p>
             <h3>O segredo desta receita</h3>
-            <p>{recipe.notes || "Nenhuma observação registrada."}</p>
+            <p className="whitespace-pre-wrap">
+              {recipe.notes || "Nenhuma observação registrada."}
+            </p>
           </div>
           <div className="info-card">
             <span>Temperatura</span>

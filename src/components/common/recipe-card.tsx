@@ -56,7 +56,7 @@ export default function RecipeCard({
             <Link href={`/receitas/${recipe.id}`}>{recipe.title}</Link>
           </h3>
           <ul className="recipe-card-categories" aria-label="Categorias">
-            {recipe.categories.map((category) => (
+            {recipe.categories.slice(0, 3).map((category) => (
               <li key={category}>{category}</li>
             ))}
           </ul>
