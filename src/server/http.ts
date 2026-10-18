@@ -9,16 +9,25 @@ import { log, logFailure } from "./logger";
 
 export function assertSameOrigin(request: Request) {
   const origin = request.headers.get("origin");
-  const expected = new URL(request.url).origin;
+  const url = new URL(request.url);
+  const host = request.headers.get("host");
+  const fetchSite = request.headers.get("sec-fetch-site");
   const allowed = (process.env.APP_ORIGINS ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
 
-  if (!origin || (origin !== expected && !allowed.includes(origin)))
+  if (!origin || origin === "null" || fetchSite === "cross-site")
     throw new DomainError("Origem da solicitação não permitida.", 403);
 
-  if (request.headers.get("sec-fetch-site") === "cross-site")
+  // O proxy pode deixar request.url com o endereço interno do Next.
+  // Host cobre HTTP local; Fetch Metadata cobre HTTPS com terminação no proxy.
+  const sameOrigin =
+    origin === url.origin ||
+    (host !== null && origin === `${url.protocol}//${host}`) ||
+    fetchSite === "same-origin";
+
+  if (!sameOrigin && !allowed.includes(origin))
     throw new DomainError("Origem da solicitação não permitida.", 403);
 }
 

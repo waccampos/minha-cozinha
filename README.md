@@ -36,18 +36,18 @@ npm run build
 
 Copie `.env.example` para `.env` e configure-o localmente; `.env` é ignorado pelo Git e pelo build Docker. Restrinja suas permissões a 0600. Não publique a saída de `docker compose config`, que pode revelar variáveis resolvidas.
 
-| Variável                 | Uso                                                                                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`           | Conexão PostgreSQL de runtime, com role restrita à aplicação. Nunca `NEXT_PUBLIC_*`.                                                            |
-| `MIGRATION_DATABASE_URL` | Conexão opcional do proprietário para migrations/backup/restauração. Se ausente, usa DATABASE_URL.                                              |
-| `IMAGE_STORAGE_DIR`      | Local: `./storage/images`. Compose força `/data/images` no volume persistente.                                                                  |
-| `BACKUP_DIR`             | Local: `./backups`. Serviço tools usa `/backups`.                                                                                               |
-| `BACKUP_HOST_DIR`        | Diretório de backups no host, montado somente no serviço tools.                                                                                 |
-| `APP_ORIGINS`            | Origens exatas autorizadas para POST, separadas por vírgula, incluindo IP/DNS e porta. Sem curingas.                                            |
-| `LAN_BIND_IP`            | IP privado do host para a porta publicada. Padrão `127.0.0.1`, acesso somente local.                                                            |
-| `APP_PORT`               | Porta publicada, padrão 3000.                                                                                                                   |
-| `PG_MAJOR`               | Cliente PostgreSQL no estágio tools, padrão 17. Use a mesma major do servidor ou cliente mais novo compatível. Não instala servidor PostgreSQL. |
-| `APP_IMAGE_TAG`          | Tag local da imagem, útil para atualização e rollback.                                                                                          |
+| Variável                 | Uso                                                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`           | Conexão PostgreSQL de runtime, com role restrita à aplicação. Nunca `NEXT_PUBLIC_*`.                                                                 |
+| `MIGRATION_DATABASE_URL` | Conexão opcional do proprietário para migrations/backup/restauração. Se ausente, usa DATABASE_URL.                                                   |
+| `IMAGE_STORAGE_DIR`      | Local: `./storage/images`. Compose força `/data/images` no volume persistente.                                                                       |
+| `BACKUP_DIR`             | Local: `./backups`. Serviço tools usa `/backups`.                                                                                                    |
+| `BACKUP_HOST_DIR`        | Diretório de backups no host, montado somente no serviço tools.                                                                                      |
+| `APP_ORIGINS`            | Origens adicionais autorizadas para POST, separadas por vírgula. Mesma origem via URL/Host ou Fetch Metadata é aceita automaticamente. Sem curingas. |
+| `LAN_BIND_IP`            | IP privado do host para a porta publicada. Padrão `127.0.0.1`, acesso somente local.                                                                 |
+| `APP_PORT`               | Porta publicada, padrão 3000.                                                                                                                        |
+| `PG_MAJOR`               | Cliente PostgreSQL no estágio tools, padrão 17. Use a mesma major do servidor ou cliente mais novo compatível. Não instala servidor PostgreSQL.      |
+| `APP_IMAGE_TAG`          | Tag local da imagem, útil para atualização e rollback.                                                                                               |
 
 Exemplo de destino: `postgresql://minha_cozinha_app:SENHA@192.168.1.10:5432/minha_cozinha?schema=minha_cozinha`. Codifique caracteres reservados da senha na URL. O código força o schema exclusivo sem trocar o banco de destino.
 
@@ -98,11 +98,11 @@ curl --fail http://IP_DO_SERVIDOR:3000/api/health
 
 ## 6. Rede local e acesso seguro
 
-Defina `LAN_BIND_IP` como o IP privado **fixo ou reservado por DHCP** do servidor, por exemplo `192.168.1.20`. Defina `APP_ORIGINS=http://192.168.1.20:3000` e use `http://192.168.1.20:3000` no notebook/celular/tablet. Dispositivos precisam estar na mesma rede ou ter rota permitida. Redes de convidados costumam ter isolamento de clientes.
+Defina `LAN_BIND_IP` como o IP privado **fixo ou reservado por DHCP** do servidor, por exemplo `192.168.1.20`. Use `http://192.168.1.20:3000` no notebook/celular/tablet. Dispositivos precisam estar na mesma rede ou ter rota permitida. Redes de convidados costumam ter isolamento de clientes.
 
 No firewall do host, autorize 3000 apenas da sub-rede doméstica. Portas publicadas pelo Docker podem contornar regras simples de UFW; aplique as regras na cadeia DOCKER-USER/nftables apropriada à sua instalação e teste de outra rede. Não crie NAT/port forwarding/UPnP no roteador. Não publique 5432. Se o banco estiver em outra máquina, permita conexão apenas a partir do host da aplicação, conforme [a configuração do PostgreSQL](docs/backend/operations.md).
 
-Para nome amigável, crie um registro A `cozinha.home.arpa` no seu DNS local (roteador, Pi-hole ou AdGuard existente). Alternativamente, se o host já anunciar mDNS/Avahi, use `NOME_DO_HOST.local`; isso depende do suporte de cada dispositivo e da rede. Não é necessário instalar DNS/Avahi dentro do container. Acrescente a origem usada a `APP_ORIGINS`.
+Para nome amigável, crie um registro A `cozinha.home.arpa` no seu DNS local (roteador, Pi-hole ou AdGuard existente). Alternativamente, se o host já anunciar mDNS/Avahi, use `NOME_DO_HOST.local`; isso depende do suporte de cada dispositivo e da rede. Não é necessário instalar DNS/Avahi dentro do container. Não é necessário cadastrar cada IP ou nome em `APP_ORIGINS` quando a página envia para sua própria origem e o Host é preservado.
 
 Se usar seu proxy reverso local existente com HTTPS, preserve o cabeçalho Host original e a origem/porta externa para Server Actions. Mantenha a verificação de origem e o serviço acessível apenas pela rede privada.
 

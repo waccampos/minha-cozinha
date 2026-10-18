@@ -8,7 +8,10 @@ Não é necessário abrir o front ou enviar cookies.
 
 Execute na raiz do projeto. Substitua a URL pela origem do seu ambiente,
 sem barra final. O valor de `Origin` deve corresponder à origem da URL
-(protocolo, domínio e porta), ou constar em `APP_ORIGINS`.
+(protocolo, domínio e porta), ao `Host` preservado com o protocolo da URL,
+ou constar em `APP_ORIGINS`. Requisições de navegador identificadas com
+`Sec-Fetch-Site: same-origin` também são aceitas, mesmo que o proxy altere a
+URL interna. O header `Origin` continua obrigatório; `cross-site` é recusado.
 
 ```sh
 COZINHA_URL='http://localhost:3000'
@@ -54,13 +57,13 @@ o conteúdo do arquivo.
 Sucesso retorna HTTP **200**, com `id` numérico e `state` contendo o estado
 atualizado da cozinha. Erros retornam `{ "error": "mensagem" }`:
 
-| Status | Significado |
-| --- | --- |
-| 400 | JSON ou campos inválidos, ou categoria inexistente |
-| 403 | `Origin` ausente/não permitido, ou requisição marcada como cross-site |
-| 413 | Corpo acima de 512 KiB |
-| 415 | `Content-Type` diferente de `application/json` |
-| 503 | Falha ao acessar os dados |
+| Status | Significado                                                           |
+| ------ | --------------------------------------------------------------------- |
+| 400    | JSON ou campos inválidos, ou categoria inexistente                    |
+| 403    | `Origin` ausente/não permitido, ou requisição marcada como cross-site |
+| 413    | Corpo acima de 512 KiB                                                |
+| 415    | `Content-Type` diferente de `application/json`                        |
+| 503    | Falha ao acessar os dados                                             |
 
 ## Imagem opcional
 
