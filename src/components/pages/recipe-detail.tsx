@@ -16,15 +16,13 @@ import useKitchenNavigation from "@/hooks/use-kitchen-navigation";
 import type { Preparation, Review } from "@/types/kitchen";
 import type { Recipe } from "@/types/recipe";
 
-export default function Detail({
-  recipe,
-  reviews,
-  preparations,
-}: {
+type DetailProps = {
   recipe: Recipe;
   reviews: Review[];
   preparations: Preparation[];
-}) {
+};
+
+export default function Detail({ recipe, reviews, preparations }: DetailProps) {
   const {
     favorites: favoriteIds,
     toggleFavorite: onFavorite,

@@ -26,13 +26,12 @@ const links: {
   { label: "Compras", icon: "bag", page: "shopping", href: "/compras" },
 ];
 
-export default function Navigation({
-  page,
-  navigate,
-}: {
+type NavigationProps = {
   page: Page;
   navigate: (page: Page) => void;
-}) {
+};
+
+export default function Navigation({ page, navigate }: NavigationProps) {
   const isActive = (target: Page) =>
     page === target || (target === "library" && page === "search");
 

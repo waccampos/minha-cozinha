@@ -19,15 +19,17 @@ export const defaultLibraryFilters: LibraryFilters = {
   rating: 0,
 };
 
+type FilterPanelProps = {
+  filters: LibraryFilters;
+  onChange: (next: LibraryFilters) => void;
+  onClear: () => void;
+};
+
 export default function FilterPanel({
   filters,
   onChange,
   onClear,
-}: {
-  filters: LibraryFilters;
-  onChange: (next: LibraryFilters) => void;
-  onClear: () => void;
-}) {
+}: FilterPanelProps) {
   const { recipeCount, categoryCounts, categories } = useKitchen();
 
   return (

@@ -17,7 +17,11 @@ import {
 } from "@/schemas/recipe.schema";
 import type { Recipe } from "@/types/recipe";
 
-export default function RecipeForm({ recipe }: { recipe?: Recipe }) {
+type RecipeFormProps = {
+  recipe?: Recipe;
+};
+
+export default function RecipeForm({ recipe }: RecipeFormProps) {
   const { navigate } = useKitchenNavigation(recipe?.id);
   const { saveRecipe, categories, pending } = useKitchen();
   const [taxonomy, setTaxonomy] = useState<"category" | "tag" | null>(null);

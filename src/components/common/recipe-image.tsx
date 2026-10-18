@@ -1,11 +1,13 @@
 import type { ImgHTMLAttributes } from "react";
 
+type RecipeImageProps = ImgHTMLAttributes<HTMLImageElement>;
+
 export default function RecipeImage({
   src,
   loading = "lazy",
   alt = "",
   ...props
-}: ImgHTMLAttributes<HTMLImageElement>) {
+}: RecipeImageProps) {
   const local = typeof src === "string" && src.startsWith("/api/images/");
 
   return (

@@ -4,7 +4,11 @@ import { useState } from "react";
 
 import Icon from "@/components/ui/icon";
 
-export default function IngredientList({ items }: { items: string[] }) {
+type IngredientListProps = {
+  items: string[];
+};
+
+export default function IngredientList({ items }: IngredientListProps) {
   const [checked, setChecked] = useState<number[]>([]);
 
   return (

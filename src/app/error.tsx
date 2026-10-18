@@ -1,6 +1,10 @@
 "use client";
 
-export default function ErrorPage({ reset }: { reset: () => void }) {
+type ErrorPageProps = {
+  reset: () => void;
+};
+
+export default function ErrorPage({ reset }: ErrorPageProps) {
   return (
     <main className="shell page">
       <h1>Não foi possível abrir esta página</h1>

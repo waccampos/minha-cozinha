@@ -2,11 +2,11 @@ import RecipeRoute from "@/components/pages/recipe-page";
 
 export const metadata = { title: "Avaliar preparo" };
 
-export default async function Page({
-  params,
-}: {
+type PageProps = {
   params: Promise<{ id: string }>;
-}) {
+};
+
+export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
   return <RecipeRoute key={id} id={id} view="review" />;

@@ -3,6 +3,15 @@
 import RecipeCard from "@/components/common/recipe-card";
 import type { Recipe } from "@/types/recipe";
 
+type RecipeGridProps = {
+  items: Recipe[];
+  onOpen: (r: Recipe) => void;
+  list?: boolean;
+  favorites?: Set<number>;
+  onFavorite?: (id: number) => void;
+  reasons?: Record<number, string>;
+};
+
 export default function RecipeGrid({
   items,
   onOpen,
@@ -10,14 +19,7 @@ export default function RecipeGrid({
   favorites,
   onFavorite,
   reasons,
-}: {
-  items: Recipe[];
-  onOpen: (r: Recipe) => void;
-  list?: boolean;
-  favorites?: Set<number>;
-  onFavorite?: (id: number) => void;
-  reasons?: Record<number, string>;
-}) {
+}: RecipeGridProps) {
   return (
     <div className={list ? "recipe-list" : "recipe-grid"}>
       {items.map((r) => (

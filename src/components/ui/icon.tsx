@@ -43,13 +43,12 @@ const icons: Record<string, LucideIcon> = {
   copy: Copy,
 };
 
-export default function Icon({
-  name,
-  size = 20,
-}: {
+type IconProps = {
   name: string;
   size?: number;
-}) {
+};
+
+export default function Icon({ name, size = 20 }: IconProps) {
   const Component = icons[name] ?? Search;
 
   return (

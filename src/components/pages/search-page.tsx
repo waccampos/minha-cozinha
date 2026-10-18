@@ -16,13 +16,15 @@ import { parseSearch } from "@/lib/search-parser";
 import type { Recipe } from "@/types/recipe";
 import type { SearchFilter } from "@/types/search";
 
+type SmartSearchPageProps = {
+  initialQuery: string;
+  initialMode: "search" | "pantry";
+};
+
 export default function SmartSearchPage({
   initialQuery,
   initialMode,
-}: {
-  initialQuery: string;
-  initialMode: "search" | "pantry";
-}) {
+}: SmartSearchPageProps) {
   const {
     recipes,
     favorites: favoriteIds,

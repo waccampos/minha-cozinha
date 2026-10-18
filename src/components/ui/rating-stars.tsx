@@ -2,15 +2,17 @@
 
 import Icon from "./icon";
 
+type RatingStarsProps = {
+  value: number;
+  interactive?: boolean;
+  onChange?: (v: number) => void;
+};
+
 export default function RatingStars({
   value,
   interactive = false,
   onChange,
-}: {
-  value: number;
-  interactive?: boolean;
-  onChange?: (v: number) => void;
-}) {
+}: RatingStarsProps) {
   return (
     <div className="stars" aria-label={`${value} de 5 estrelas`}>
       {[1, 2, 3, 4, 5].map((n) => (

@@ -2,11 +2,11 @@ import Screen from "@/components/pages/search-page";
 
 export const metadata = { title: "Busca" };
 
-export default async function Page({
-  searchParams,
-}: {
+type PageProps = {
   searchParams: Promise<{ q?: string; modo?: string }>;
-}) {
+};
+
+export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
   const mode = params.modo === "despensa" ? "pantry" : "search";
 

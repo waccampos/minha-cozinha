@@ -3,13 +3,12 @@
 import Icon from "@/components/ui/icon";
 import { categories } from "@/constants/category-artwork";
 
-export default function CategoryCard({
-  item,
-  onClick,
-}: {
+type CategoryCardProps = {
   item: (typeof categories)[number];
   onClick: () => void;
-}) {
+};
+
+export default function CategoryCard({ item, onClick }: CategoryCardProps) {
   return (
     <button className="category-card" onClick={onClick}>
       <img

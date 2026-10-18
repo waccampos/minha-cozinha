@@ -25,15 +25,17 @@ const ratings = [
   "Inesquecível",
 ];
 
+type ReviewPageProps = {
+  recipe: Recipe;
+  review?: Review;
+  onSaved?: () => void;
+};
+
 export default function ReviewPage({
   recipe,
   review,
   onSaved,
-}: {
-  recipe: Recipe;
-  review?: Review;
-  onSaved?: () => void;
-}) {
+}: ReviewPageProps) {
   const { navigate } = useKitchenNavigation(recipe.id);
   const { saveReview, pending } = useKitchen();
   const params = useSearchParams();

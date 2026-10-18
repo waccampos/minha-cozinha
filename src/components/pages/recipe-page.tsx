@@ -12,13 +12,12 @@ import { useKitchen } from "@/hooks/use-kitchen";
 import type { Review, Preparation } from "@/types/kitchen";
 import type { Recipe } from "@/types/recipe";
 
-export default function RecipeRoute({
-  id,
-  view,
-}: {
+type RecipeRouteProps = {
   id: string;
   view: "detail" | "cooking" | "form" | "review";
-}) {
+};
+
+export default function RecipeRoute({ id, view }: RecipeRouteProps) {
   const params = useSearchParams();
   const { recipes } = useKitchen();
   const [data, setData] = useState<{

@@ -3,7 +3,11 @@
 import Button from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 
-export default function EmptyState({ clear }: { clear: () => void }) {
+type EmptyStateProps = {
+  clear: () => void;
+};
+
+export default function EmptyState({ clear }: EmptyStateProps) {
   return (
     <div className="empty-state">
       <span>

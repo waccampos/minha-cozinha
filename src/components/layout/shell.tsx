@@ -8,13 +8,12 @@ import type { Page } from "@/lib/navigation";
 
 import Navigation from "./navigation";
 
-export default function Shell({
-  children,
-  footer,
-}: {
+type ShellProps = {
   children: ReactNode;
   footer: ReactNode;
-}) {
+};
+
+export default function Shell({ children, footer }: ShellProps) {
   const path = usePathname();
   const { navigate } = useKitchenNavigation();
   const page: Page =

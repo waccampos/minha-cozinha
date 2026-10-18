@@ -2,17 +2,19 @@
 
 import Icon from "./icon";
 
+type SectionHeadingProps = {
+  eyebrow?: string;
+  title: string;
+  action?: string;
+  onAction?: () => void;
+};
+
 export default function SectionHeading({
   eyebrow,
   title,
   action,
   onAction,
-}: {
-  eyebrow?: string;
-  title: string;
-  action?: string;
-  onAction?: () => void;
-}) {
+}: SectionHeadingProps) {
   return (
     <div className="section-heading">
       <div>

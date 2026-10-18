@@ -4,11 +4,7 @@ import RecipeImage from "@/components/common/recipe-image";
 import Button from "@/components/ui/button";
 import type { Recipe } from "@/types/recipe";
 
-export default function PantryResult({
-  item,
-  onOpen,
-  ready = false,
-}: {
+type PantryResultProps = {
   item: {
     recipe: Recipe;
     matched: string[];
@@ -17,7 +13,13 @@ export default function PantryResult({
   };
   onOpen: (recipe: Recipe) => void;
   ready?: boolean;
-}) {
+};
+
+export default function PantryResult({
+  item,
+  onOpen,
+  ready = false,
+}: PantryResultProps) {
   return (
     <article className="pantry-result">
       <RecipeImage src={item.recipe.image} alt="" loading="lazy" />

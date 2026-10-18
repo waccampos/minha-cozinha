@@ -6,15 +6,17 @@ import { KitchenContext } from "@/hooks/use-kitchen";
 import { useKitchenController } from "@/hooks/use-kitchen-controller";
 import type { KitchenState } from "@/types/kitchen";
 
+type KitchenProviderProps = {
+  children: ReactNode;
+  initialData?: KitchenState;
+  initialError?: string;
+};
+
 export default function KitchenProvider({
   children,
   initialData,
   initialError,
-}: {
-  children: ReactNode;
-  initialData?: KitchenState;
-  initialError?: string;
-}) {
+}: KitchenProviderProps) {
   const { value, refresh } = useKitchenController(initialData, initialError);
 
   return (

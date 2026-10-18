@@ -10,7 +10,11 @@ import { useKitchen } from "@/hooks/use-kitchen";
 import useKitchenNavigation from "@/hooks/use-kitchen-navigation";
 import type { Recipe } from "@/types/recipe";
 
-export default function CookingMode({ recipe }: { recipe: Recipe }) {
+type CookingModeProps = {
+  recipe: Recipe;
+};
+
+export default function CookingMode({ recipe }: CookingModeProps) {
   const { navigate } = useKitchenNavigation(recipe.id);
   const router = useRouter();
   const { command, pending } = useKitchen();

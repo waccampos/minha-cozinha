@@ -13,13 +13,15 @@ import { useKitchen } from "@/hooks/use-kitchen";
 import useKitchenNavigation from "@/hooks/use-kitchen-navigation";
 import type { Recipe } from "@/types/recipe";
 
+type LibraryProps = {
+  favoritesOnly?: boolean;
+  initialCategory?: string;
+};
+
 export default function Library({
   favoritesOnly = false,
   initialCategory,
-}: {
-  favoritesOnly?: boolean;
-  initialCategory?: string;
-}) {
+}: LibraryProps) {
   const { favorites: favoriteIds, toggleFavorite: onFavorite } = useKitchen();
 
   const favorites = useMemo(() => new Set(favoriteIds), [favoriteIds]);

@@ -2,6 +2,15 @@
 
 import Icon from "@/components/ui/icon";
 
+type SearchBarProps = {
+  value: string;
+  onChange: (v: string) => void;
+  compact?: boolean;
+  onSubmit?: () => void;
+  placeholder?: string;
+  autoFocus?: boolean;
+};
+
 export default function SearchBar({
   value,
   onChange,
@@ -9,14 +18,7 @@ export default function SearchBar({
   onSubmit,
   placeholder,
   autoFocus = false,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  compact?: boolean;
-  onSubmit?: () => void;
-  placeholder?: string;
-  autoFocus?: boolean;
-}) {
+}: SearchBarProps) {
   return (
     <form
       className={`search ${compact ? "compact" : ""}`}

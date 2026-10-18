@@ -6,20 +6,22 @@ import RecipeImage from "@/components/common/recipe-image";
 import Icon from "@/components/ui/icon";
 import type { Recipe } from "@/types/recipe";
 
-export default function RecipeCard({
-  recipe,
-  list = false,
-  favorite = recipe.favorite,
-  onFavorite,
-  reason,
-}: {
+type RecipeCardProps = {
   recipe: Recipe;
   onOpen: (r: Recipe) => void;
   list?: boolean;
   favorite?: boolean;
   onFavorite?: (id: number) => void;
   reason?: string;
-}) {
+};
+
+export default function RecipeCard({
+  recipe,
+  list = false,
+  favorite = recipe.favorite,
+  onFavorite,
+  reason,
+}: RecipeCardProps) {
   return (
     <article className={`recipe-card ${list ? "list-card" : ""}`}>
       <div className="card-image">

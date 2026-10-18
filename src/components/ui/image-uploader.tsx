@@ -4,13 +4,12 @@ import { useId, useRef, useState } from "react";
 
 import Icon from "./icon";
 
-export default function ImageUploader({
-  value,
-  onChange,
-}: {
+type ImageUploaderProps = {
   value: string;
   onChange: (value: string) => void;
-}) {
+};
+
+export default function ImageUploader({ value, onChange }: ImageUploaderProps) {
   const id = useId();
 
   const input = useRef<HTMLInputElement>(null);

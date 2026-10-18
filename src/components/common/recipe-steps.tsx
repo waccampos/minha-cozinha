@@ -1,6 +1,10 @@
 "use client";
 
-export default function RecipeSteps({ steps }: { steps: string[] }) {
+type RecipeStepsProps = {
+  steps: string[];
+};
+
+export default function RecipeSteps({ steps }: RecipeStepsProps) {
   return (
     <ol className="steps">
       {steps.map((step, i) => (

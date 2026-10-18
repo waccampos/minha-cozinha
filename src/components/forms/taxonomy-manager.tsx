@@ -7,13 +7,15 @@ import Modal from "@/components/ui/modal";
 import { useKitchen } from "@/hooks/use-kitchen";
 import type { NamedEntity } from "@/types/kitchen";
 
+type TaxonomyManagerProps = {
+  kind: "category" | "tag";
+  onClose: () => void;
+};
+
 export default function TaxonomyManager({
   kind,
   onClose,
-}: {
-  kind: "category" | "tag";
-  onClose: () => void;
-}) {
+}: TaxonomyManagerProps) {
   const { categories, tags, command, pending } = useKitchen();
   const [editing, setEditing] = useState<NamedEntity | null>(null);
   const rows = kind === "category" ? categories : tags;
