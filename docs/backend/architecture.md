@@ -11,7 +11,10 @@ src/
     layout/               Navegação, shell e provider visual
     forms/                Formulários compostos e gerenciamento de opções
     common/               Cards, listas, filtros e imagens reutilizáveis
-    pages/                Composição visual das telas
+    pages/                Uma pasta por tela, com visual e controller
+      home/
+        home.page.tsx     JSX e composição visual
+        home.controller.ts Estados, efeitos, handlers e dados da home
   server/
     services/             Regras, validação e coordenação transacional
     repositories/         Consultas, escrita Prisma e mapeamento dos resultados
@@ -35,6 +38,24 @@ Server Actions e Route Handlers compartilham o mesmo serviço de comandos. O ser
 Repositórios contêm Prisma e SQL. `recipe.mapper.ts` compartilha a projeção/mapeamento usada na biblioteca, snapshot e pesquisa. Serviços de imagem coordenam os metadados do repositório e o armazenamento; o módulo de storage não consulta o banco. O parser de pesquisa é puro e fica em `lib/search-parser.ts`; filtros interpretados e tipos ficam separados da consulta SQL.
 
 `app/` mantém as mesmas URLs. As composições complexas ficam em `components/pages`; formulários ficam em `components/forms`. A reorganização não altera migrations, registros persistidos ou seletores CSS da interface.
+
+## Páginas e controllers
+
+Cada tela segue `components/pages/<nome>/<nome>.page.tsx` e
+`<nome>.controller.ts`. O controller exporta um hook `useNomeController`,
+responsável por estados, efeitos, consultas, mutações, handlers e preparação
+dos dados de apresentação. `.controller.tsx` pode ser usado caso seja
+necessário, mas os controllers atuais não precisam de JSX.
+
+A página chama seu controller e usa o resultado para renderizar a interface.
+Condições de exibição, mapeamento de elementos e ligação de eventos continuam
+no JSX. Cálculos, leitura de formulários, decisões de navegação e comandos
+ficam no controller. Props têm tipos nomeados declarados acima das funções.
+
+Controllers das telas usam `useKitchen`, navegação e contratos existentes;
+não importam infraestrutura de servidor. Hooks compartilhados continuam em
+`src/hooks`. Os formulários reutilizáveis de receita e avaliação permanecem em
+`components/forms`, montados pela página `recipe-route`.
 
 ## Convenções de leitura
 
