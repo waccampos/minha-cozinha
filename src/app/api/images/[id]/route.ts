@@ -1,15 +1,13 @@
 import { z } from "zod";
 
-import { errorResponse } from "@/server/http";
+import { withRequestLog } from "@/server/http";
 import { readImage, thumbnail } from "@/server/services/image.service";
 
 export const runtime = "nodejs";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  try {
+export const GET = withRequestLog(
+  "/api/images/[id]",
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
     z.uuid().parse(id);
 
@@ -49,7 +47,5 @@ export async function GET(
         "Content-Disposition": `inline; filename="${image.fileName}"`,
       },
     });
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+  },
+);

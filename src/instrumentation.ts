@@ -1,10 +1,14 @@
 import type { Instrumentation } from "next";
 
 export const onRequestError: Instrumentation.onRequestError = async (
-  _error,
+  error,
   _request,
   context,
 ) => {
-  const { log } = await import("./server/logger");
-  log("error", "next.request_failed", { operation: context.routeType });
+  const { logFailure } = await import("./server/logger");
+
+  logFailure("next.request_failed", error, {
+    operation: context.routeType,
+    status: 500,
+  });
 };

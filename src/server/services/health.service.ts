@@ -1,8 +1,7 @@
 import "server-only";
 
-import { diagnosticCode } from "@/lib/errors";
 import { checkApplicationDatabase } from "@/server/database/prisma";
-import { log } from "@/server/logger";
+import { logFailure } from "@/server/logger";
 import { checkImageStorage } from "@/server/storage/image-storage";
 
 let cached: { expires: number; ok: boolean } | undefined;
@@ -12,15 +11,18 @@ export async function healthy() {
 
   const started = Date.now();
   let ok = false;
+  let operation = "health.database";
 
   try {
     await checkApplicationDatabase();
+    operation = "health.storage";
     await checkImageStorage();
     ok = true;
   } catch (error) {
-    log("warn", "health.not_ready", {
+    logFailure("health.not_ready", error, {
       durationMs: Date.now() - started,
-      code: diagnosticCode(error),
+      operation,
+      status: 503,
     });
   }
 

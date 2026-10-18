@@ -2,6 +2,56 @@
 
 # Operação do PostgreSQL existente
 
+## Logs da aplicação
+
+Os logs são escritos em stdout/stderr. Por padrão, exibem horário UTC em ISO,
+nível, mensagem em português, operação, rota, status e duração. Nas falhas,
+incluem código, causa classificada e orientação para investigação. Erros de
+validação mostram somente os nomes dos campos e o tipo da validação.
+
+```text
+2026-10-18T14:32:10.000Z WARN — Falha na requisição
+  Operação: recipe.save
+  Rota: POST /api/kitchen
+  Status: 400
+  Duração: 18 ms
+  Requisição: 2a993090-3b8c-4e86-963b-39c885337296
+  Código: VALIDATION_ERROR
+  Causa: Campos inválidos na solicitação.
+  Campos: values.title (too_small)
+  Orientação: Confira os campos indicados e seus tipos no JSON ou formulário.
+```
+
+Configure no ambiente do servidor e reinicie o processo/container:
+
+| Variável     | Valores                   | Padrão   |
+| ------------ | ------------------------- | -------- |
+| `LOG_FORMAT` | `pretty` ou `json`        | `pretty` |
+| `LOG_LEVEL`  | `info`, `warn` ou `error` | `info`   |
+
+`warn` oculta sucessos; `error` exibe somente falhas de servidor. Valores
+inválidos usam os padrões. JSON produz um objeto por linha, adequado a
+coletores. Essas opções afetam os logs da aplicação; o Next.js e outras
+ferramentas podem imprimir suas próprias mensagens.
+
+Para acompanhar a instalação Docker:
+
+```sh
+docker compose logs --follow --tail=100 app
+```
+
+Cada resposta de API contém `X-Request-Id`, gerado pelo servidor. Copie esse
+valor da aba Network do navegador ou dos headers da resposta HTTP e procure
+nos logs. Server Actions também geram um identificador para agrupar a operação
+no servidor. Os tempos são medidos até a criação da resposta, sem incluir a
+transferência pela rede.
+
+O diagnóstico não registra payloads, valores dos campos, URLs reais, SQL,
+cookies ou mensagens brutas de exceções. Uma falha não reconhecida aparece
+como `UNEXPECTED`; use operação, código HTTP e identificador para investigá-la.
+A verificação de saúde identifica `health.database` ou `health.storage` e
+registra a falha quando refaz o diagnóstico, preservando o cache de dez segundos.
+
 ## Ferramentas Docker e engines do Prisma
 
 O estágio base inclui OpenSSL antes da instalação de dependências para manter a detecção de plataforma consistente. O estágio tools prepara o engine do Prisma durante o build e valida o schema como UID 1001, o mesmo usuário definido no Compose. O diretório de engines e o HOME desse usuário permitem as gravações de cache necessárias. A validação do schema não aplica migrations nem conecta ao banco.

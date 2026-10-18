@@ -1,14 +1,10 @@
-import { assertSameOrigin, errorResponse } from "@/server/http";
+import { assertSameOrigin, withRequestLog } from "@/server/http";
 import { uploadImage } from "@/server/services/image.service";
 
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
-  try {
-    assertSameOrigin(request);
+export const POST = withRequestLog("/api/images", async (request) => {
+  assertSameOrigin(request);
 
-    return Response.json(await uploadImage(request), { status: 201 });
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+  return Response.json(await uploadImage(request), { status: 201 });
+});
